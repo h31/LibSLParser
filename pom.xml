@@ -7,7 +7,15 @@
 
     <groupId>ru.spbstu.kspt.librarymigration</groupId>
     <artifactId>modelparser</artifactId>
-    <version>0.2</version>
+    <version>0.2-SNAPSHOT</version>
+    <scm>
+        <connection>
+            scm:git:https://github.com/h31/ModelParser
+        </connection>
+        <developerConnection>
+            scm:git:https://github.com/h31/ModelParser
+        </developerConnection>
+    </scm>
 
     <distributionManagement>
         <repository>
@@ -82,10 +90,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.1.0</version>
                 <configuration>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
@@ -105,6 +114,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                </configuration>
             </plugin>
         </plugins>
     </build>

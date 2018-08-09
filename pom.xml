@@ -19,7 +19,7 @@
     <distributionManagement>
         <repository>
             <id>bintray-artyom-h31-LibraryMigration</id>
-            <url>http://api.bintray.com/maven/artyom-h31/LibraryMigration/ModelParser/;publish=1</url>
+            <url>https://api.bintray.com/maven/artyom-h31/LibraryMigration/ModelParser/;publish=1</url>
         </repository>
     </distributionManagement>
 

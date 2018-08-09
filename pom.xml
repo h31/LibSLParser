@@ -5,7 +5,7 @@
 
     <groupId>ru.spbstu.kspt.librarymigration</groupId>
     <artifactId>modelparser</artifactId>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.3</version>
     <scm>
         <connection>
             scm:git:https://github.com/h31/ModelParser
@@ -13,7 +13,7 @@
         <developerConnection>
             scm:git:https://github.com/h31/ModelParser
         </developerConnection>
-      <tag>HEAD</tag>
+      <tag>modelparser-0.3</tag>
   </scm>
 
     <distributionManagement>

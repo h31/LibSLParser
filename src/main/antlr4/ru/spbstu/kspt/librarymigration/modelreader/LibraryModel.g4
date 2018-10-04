@@ -5,7 +5,8 @@ start
    ;
 
 description
-   :   (typesSection
+   :   (importSection
+          |   typesSection
           |   convertersSection
           |   automatonDescription
           |   funDecl)+
@@ -17,6 +18,19 @@ description
 //   |   automatonDescription
 //   |   funDecl)
 //   ;
+
+importSection
+   :   'imports' '{' importedStatement+ '}'
+   ;
+
+importedStatement
+   :   importedName ';'
+   ;
+
+
+importedName
+   :   Identifier
+   ;
 
 typesSection
    :   'types' '{' typeDecl+ '}'

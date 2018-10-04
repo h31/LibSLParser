@@ -14,12 +14,12 @@
             scm:git:https://github.com/h31/ModelParser
         </developerConnection>
       <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <distributionManagement>
         <repository>
-            <id>bintray-artyom-h31-LibraryMigration</id>
-            <url>https://api.bintray.com/maven/artyom-h31/LibraryMigration/ModelParser/;publish=1</url>
+            <id>ssh-repository</id>
+            <url>scpexe://rock64/home/artyom/Repositories/ModelParser</url>
         </repository>
     </distributionManagement>
 
@@ -60,6 +60,16 @@
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
         <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+
+        <extensions>
+            <!-- Enabling the use of SSH -->
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh-external</artifactId>
+                <version>3.2.0</version>
+            </extension>
+        </extensions>
+
 
         <plugins>
             <plugin>

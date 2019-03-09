@@ -46,10 +46,8 @@ class Postprocessor {
                 param = functionDecl.args.map { EntityParam(machine = checkNotNull(machines[it.type])) } + actionParams,
                 actions = functionDecl.actions.map { Action(name = it.name) },
                 hasReturnValue = functionDecl.returnValue != null,
-                isStatic = functionDecl.isStatic)
+                isStatic = functionDecl.staticName != null)
         if (functionDecl.returnValue != null) {
-            println(machines)
-            println(functionDecl.returnValue)
             LinkedEdge(edge = edge, dst = machines[functionDecl.returnValue]!!.getDefaultState())
         }
         return edge

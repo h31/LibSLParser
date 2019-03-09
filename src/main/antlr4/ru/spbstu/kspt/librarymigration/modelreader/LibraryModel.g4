@@ -19,6 +19,19 @@ description
 //   |   funDecl)
 //   ;
 
+includeSection
+   :   'includes' '{' includedStatement+ '}'
+   ;
+
+includedStatement
+   :   includedName ';'
+   ;
+
+
+includedName
+   :   Identifier
+   ;
+
 importSection
    :   'imports' '{' importedStatement+ '}'
    ;
@@ -29,7 +42,7 @@ importedStatement
 
 
 importedName
-   :   Identifier
+   :   (Identifier|'.'|'/'|'\\')+
    ;
 
 typesSection
@@ -45,7 +58,15 @@ semanticType
    ;
 
 codeType
-   :   Identifier ('.' codeType)? ('[]')?
+   :   (primitiveType | complexType) ('[]')?
+   ;
+
+primitiveType
+   :   'native:' Identifier
+   ;
+
+complexType
+   :   Identifier ('.' complexType)?
    ;
 
 convertersSection
@@ -65,11 +86,11 @@ converterExpression
    ;
 
 automatonDescription
-   :   'automaton' automatonName '{' (stateDecl|finishstateDecl|shiftDecl)* '}'
+   :   'automaton' automatonName '{' (stateDecl|finishstateDecl|shiftDecl|extendableFlag)* '}'
    ;
 
 stateDecl
-   :   'state' stateName ';'
+   :   'state' stateName (',' stateName)* ';'
    ;
 
 finishstateDecl
@@ -96,6 +117,10 @@ automatonName
    :   Identifier
    ;
 
+extendableFlag
+   :   'extendable;'
+   ;
+
 funDecl
    :   'fun' entityName '.' funName '(' funArgs? ')' (':' funReturnType)? (';' | '{' funProperties* '}')
    ;
@@ -113,11 +138,23 @@ actionDecl
    ;
 
 propertyDecl
-   :   'property' '"' Identifier '"' '=' '"' Identifier '"' ';'
+   :   'property' '"' propertyKey '"' '=' '"' propertyValue '"' ';'
+   ;
+
+propertyKey
+   :   Identifier
+   ;
+
+propertyValue
+   :   Identifier
    ;
 
 staticDecl
-   :   'static' ';'
+   :   'static' ('"' staticName '"')? ';'
+   ;
+
+staticName
+   :   Identifier
    ;
 
 actionName
@@ -146,11 +183,11 @@ argName
    ;
 
 argType
-   : Identifier
+   : Identifier ('[]')*
    ;
 
 funReturnType
-   :   Identifier
+   :   Identifier ('[]')*
    ;
 
 containsTreeType

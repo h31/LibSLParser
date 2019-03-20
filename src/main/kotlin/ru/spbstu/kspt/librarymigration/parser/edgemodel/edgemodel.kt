@@ -1,4 +1,4 @@
-package ru.spbstu.kspt.librarymigration
+package ru.spbstu.kspt.librarymigration.parser.edgemodel
 
 /**
  * Created by artyom on 16.06.16.

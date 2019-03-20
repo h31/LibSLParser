@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.CommonTokenStream
 import ru.spbstu.kspt.librarymigration.modelreader.LibraryModelBaseVisitor
 import ru.spbstu.kspt.librarymigration.modelreader.LibraryModelLexer
 import ru.spbstu.kspt.librarymigration.modelreader.LibraryModelParser
+import ru.spbstu.kspt.librarymigration.parser.edgemodel.EdgeModelConverter
 import java.io.InputStream
 
 /**
@@ -21,7 +22,7 @@ class ModelParser {
         return LibraryModelReader().visitStart(start)
     }
 
-    fun postprocess(libraryDecl: LibraryDecl) = Postprocessor().process(libraryDecl)
+    fun postprocess(libraryDecl: LibraryDecl) = EdgeModelConverter().convert(libraryDecl)
 }
 
 class LibraryModelReader : LibraryModelBaseVisitor<Node>() {
@@ -41,11 +42,11 @@ class LibraryModelReader : LibraryModelBaseVisitor<Node>() {
         val states = ctx.stateDecl().flatMap { visitStateDecl(it) }
         val shifts = ctx.shiftDecl().map { visitShiftDecl(it) }
         val extendable = ctx.extendableFlag().any()
-        return Automaton(name = ctx.automatonName().text, states = states, shifts = shifts, extendable = extendable)
+        return Automaton(name = SemanticType(ctx.automatonName().text), states = states, shifts = shifts, extendable = extendable)
     }
 
-    override fun visitTypeDecl(ctx: LibraryModelParser.TypeDeclContext): Type =
-            Type(semanticType = ctx.semanticType().text, codeType = ctx.codeType().text)
+    override fun visitTypeDecl(ctx: LibraryModelParser.TypeDeclContext): TypeDecl =
+            TypeDecl(semanticType = SemanticType(ctx.semanticType().text), codeType = CodeType(ctx.codeType().text))
 
     override fun visitStateDecl(ctx: LibraryModelParser.StateDeclContext): NodeList<StateDecl> =
             NodeList(ctx.stateName().map { StateDecl(name = it.text) })
@@ -55,7 +56,7 @@ class LibraryModelReader : LibraryModelBaseVisitor<Node>() {
                     functions = ctx.funName().map { it.text })
 
     override fun visitConverter(ctx: LibraryModelParser.ConverterContext): Converter =
-            Converter(entity = ctx.destEntity().text, expression = ctx.converterExpression().text)
+            Converter(entity = SemanticType(ctx.destEntity().text), expression = ctx.converterExpression().text)
 
     override fun visitFunDecl(ctx: LibraryModelParser.FunDeclContext): FunctionDecl {
         println(ctx.funArgs())
@@ -63,10 +64,10 @@ class LibraryModelReader : LibraryModelBaseVisitor<Node>() {
         val actions = ctx.funProperties().map { visit(it) }.filterIsInstance<ActionDecl>()
         val staticName = ctx.funProperties().map { visit(it) }.filterIsInstance<StaticDecl>().singleOrNull()
         val properties = ctx.funProperties().map { visit(it) }.filterIsInstance<PropertyDecl>()
-        return FunctionDecl(entity = ctx.entityName().text,
+        return FunctionDecl(entity = SemanticType(ctx.entityName().text),
                 name = ctx.funName().text,
                 args = args, actions = actions,
-                returnValue = ctx.funReturnType()?.text,
+                returnValue = if (ctx.funReturnType() != null) SemanticType(ctx.funReturnType().text) else null,
                 staticName = staticName,
                 properties = properties)
     }
@@ -76,7 +77,7 @@ class LibraryModelReader : LibraryModelBaseVisitor<Node>() {
     }
 
     override fun visitFunArg(ctx: LibraryModelParser.FunArgContext): FunctionArgument =
-            FunctionArgument(name = ctx.argName().text, type = ctx.argType().text)
+            FunctionArgument(name = ctx.argName().text, type = SemanticType(ctx.argType().text))
 
     override fun visitStaticDecl(ctx: LibraryModelParser.StaticDeclContext): StaticDecl =
             StaticDecl(staticName = ctx.staticName()?.text ?: "")

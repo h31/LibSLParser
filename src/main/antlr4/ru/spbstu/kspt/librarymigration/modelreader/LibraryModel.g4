@@ -54,7 +54,7 @@ typeDecl
    ;
 
 semanticType
-   :   Identifier
+   :   Identifier ('[]'|'*')*
    ;
 
 codeType
@@ -62,7 +62,7 @@ codeType
    ;
 
 primitiveType
-   :   'native:' Identifier
+   :   'primitive:' Identifier
    ;
 
 complexType
@@ -78,7 +78,7 @@ converter
    ;
 
 destEntity
-   :   Identifier
+   :   semanticType
    ;
 
 converterExpression
@@ -183,11 +183,11 @@ argName
    ;
 
 argType
-   : Identifier ('[]')*
+   :   semanticType
    ;
 
 funReturnType
-   :   Identifier ('[]')*
+   :   semanticType
    ;
 
 containsTreeType

@@ -1,6 +1,6 @@
 package ru.spbstu.kspt.librarymigration.parser
 
-val primitiveSemanticTypes = listOf("String", "Int", "Char")
+val primitiveSemanticTypes = listOf("String", "Int", "Char", "Boolean")
 
 fun LibraryDecl.getArrayTypesFromFunctionDecls(): Collection<SemanticType> =
         this.functions.flatMap { it.args }.map { it.type }.filter { it.isArray() }.toSet()

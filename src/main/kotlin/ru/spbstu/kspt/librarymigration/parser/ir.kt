@@ -2,12 +2,14 @@ package ru.spbstu.kspt.librarymigration.parser
 
 val primitiveSemanticTypes = listOf("String", "Int", "Char", "Boolean")
 
-fun LibraryDecl.getArrayTypesFromFunctionDecls(): Collection<SemanticType> =
-        this.functions.flatMap { it.args }.map { it.type }.filter { it.isArray() }.toSet()
+fun LibraryDecl.getArrayTypesFromFunctionDecls(): Collection<ComplexSemanticType> =
+        this.functions.flatMap { it.args }.map { it.type }.filterArrayTypes().toSet()
 
-fun SemanticType.itemType() = SemanticType(typeName.removeSuffix("[]"))
+fun Collection<SemanticType>.filterArrayTypes() = filterIsInstance<ComplexSemanticType>().filter { it.isArray() }
 
-fun SemanticType.isArray() = typeName.endsWith("[]")
+fun SemanticType.isArray() = this is ComplexSemanticType && enclosingType.typeName == "[]"
+
+fun SemanticType.isPointer() = this is ComplexSemanticType && enclosingType.typeName == "*"
 
 fun SemanticType.isReference() = typeName !in primitiveSemanticTypes
 
@@ -18,7 +20,7 @@ operator fun List<TypeDecl>.get(semanticType: SemanticType) = first { it.semanti
 fun LibraryDecl.addArrayTypeDecls(convertToCodeArrayType: (CodeType) -> CodeType): LibraryDecl {
     val arrayTypes = this.getArrayTypesFromFunctionDecls()
     val typeDecls = arrayTypes.map { arrayType ->
-        val itemType = arrayType.itemType()
+        val itemType = arrayType.innerType
         val codeItemType = types[itemType].codeType
         val codeArrayType = convertToCodeArrayType(codeItemType)
         TypeDecl(semanticType = arrayType, codeType = codeArrayType)
@@ -26,19 +28,41 @@ fun LibraryDecl.addArrayTypeDecls(convertToCodeArrayType: (CodeType) -> CodeType
     return this.copy(types = this.types + typeDecls)
 }
 
-fun LibraryDecl.generateHandlersForArrayTypes(): LibraryDecl {
-    val arrayTypes = this.types.filter { it.semanticType.typeName.endsWith("[]") }
+private fun toCodeType(complexType: ComplexSemanticType, typeDeclarations: List<TypeDecl>, complexTypeConversion: Map<String, String>): String {
+    val rule = checkNotNull(complexTypeConversion[complexType.enclosingType.typeName])
+    val innerTypeText = if (complexType.innerType is ComplexSemanticType) {
+        toCodeType(complexType.innerType, typeDeclarations, complexTypeConversion)
+    } else {
+        typeDeclarations[complexType.innerType].codeType.typeName
+    }
+    return rule.format(innerTypeText)
+}
+
+fun LibraryDecl.addComplexTypesDecls(complexTypeConversion: Map<String, String>): LibraryDecl {
+    val usedTypes = this.functions.flatMap { it.args }.map { it.type } + this.functions.map { it.returnValue }
+    val complexTypes = usedTypes.filterIsInstance<ComplexSemanticType>()
+    val typeDecls = complexTypes.map { complexType ->
+        TypeDecl(semanticType = complexType, codeType = CodeType(toCodeType(complexType, this.types, complexTypeConversion)))
+    }
+    val automata = typeDecls.map { type ->
+        Automaton(name = type.semanticType, states = listOf(), shifts = listOf(), extendable = false)
+    }
+    return this.copy(types = this.types + typeDecls, automata = this.automata + automata)
+}
+
+fun LibraryDecl.generateHandlersForArrayAndPointerTypes(): LibraryDecl {
+    val arrayTypes = this.types.filter { it.semanticType.isArray() || it.semanticType.isPointer() }.toSet()
 //    val automata = mutableListOf<Automaton>()
     val newFunctionDecl = mutableListOf<FunctionDecl>()
     for (arrayType in arrayTypes) {
-        val itemType = arrayType.semanticType.itemType()// getItemType(type, types)
-        val codeType = arrayType.codeType //getArrayType(itemType)
+        val itemType = (arrayType.semanticType as ComplexSemanticType).innerType // getItemType(type, types) TODO: Dirty
+        val codeType = this.types[itemType].codeType.typeName //getArrayType(itemType)
         val baseFunctionDecl = FunctionDecl(entity = arrayType.semanticType, name = "", args = listOf(),
                 actions = listOf(), returnValue = null, staticName = null,
                 properties = listOf(), builtin = true)
-        val set = baseFunctionDecl.copy(name = "set<$itemType>")
-        val get = baseFunctionDecl.copy(name = "get<$itemType>")
-        val memAlloc = baseFunctionDecl.copy(name = "mem_alloc<$itemType>")
+        val set = baseFunctionDecl.copy(name = "set<$codeType>")
+        val get = baseFunctionDecl.copy(name = "get<$codeType>")
+        val memAlloc = baseFunctionDecl.copy(name = "mem_alloc<$codeType>")
         newFunctionDecl += listOf(set, get, memAlloc)
 //        val arrayAutomaton = Automaton(name = type,
 //                states = listOf(StateDecl("Created"), StateDecl("Constructed")),

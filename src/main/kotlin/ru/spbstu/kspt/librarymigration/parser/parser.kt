@@ -42,11 +42,11 @@ class LibraryModelReader : LibraryModelBaseVisitor<Node>() {
         val states = ctx.stateDecl().flatMap { visitStateDecl(it) }
         val shifts = ctx.shiftDecl().map { visitShiftDecl(it) }
         val extendable = ctx.extendableFlag().any()
-        return Automaton(name = SemanticType(ctx.automatonName().text), states = states, shifts = shifts, extendable = extendable)
+        return Automaton(name = visitSemanticType(ctx.automatonName().semanticType()), states = states, shifts = shifts, extendable = extendable)
     }
 
     override fun visitTypeDecl(ctx: LibraryModelParser.TypeDeclContext): TypeDecl =
-            TypeDecl(semanticType = SemanticType(ctx.semanticType().text), codeType = CodeType(ctx.codeType().text))
+            TypeDecl(semanticType = visitSemanticType(ctx.semanticType()), codeType = CodeType(ctx.codeType().text))
 
     override fun visitStateDecl(ctx: LibraryModelParser.StateDeclContext): NodeList<StateDecl> =
             NodeList(ctx.stateName().map { StateDecl(name = it.text) })
@@ -56,7 +56,7 @@ class LibraryModelReader : LibraryModelBaseVisitor<Node>() {
                     functions = ctx.funName().map { it.text })
 
     override fun visitConverter(ctx: LibraryModelParser.ConverterContext): Converter =
-            Converter(entity = SemanticType(ctx.destEntity().text), expression = ctx.converterExpression().text)
+            Converter(entity = visitSemanticType(ctx.destEntity().semanticType()), expression = ctx.converterExpression().text)
 
     override fun visitFunDecl(ctx: LibraryModelParser.FunDeclContext): FunctionDecl {
         println(ctx.funArgs())
@@ -64,10 +64,10 @@ class LibraryModelReader : LibraryModelBaseVisitor<Node>() {
         val actions = ctx.funProperties().map { visit(it) }.filterIsInstance<ActionDecl>()
         val staticName = ctx.funProperties().map { visit(it) }.filterIsInstance<StaticDecl>().singleOrNull()
         val properties = ctx.funProperties().map { visit(it) }.filterIsInstance<PropertyDecl>()
-        return FunctionDecl(entity = SemanticType(ctx.entityName().text),
+        return FunctionDecl(entity = visitSemanticType(ctx.entityName().semanticType()),
                 name = ctx.funName().text,
                 args = args, actions = actions,
-                returnValue = if (ctx.funReturnType() != null) SemanticType(ctx.funReturnType().text) else null,
+                returnValue = if (ctx.funReturnType() != null) visitSemanticType(ctx.funReturnType().semanticType()) else null,
                 staticName = staticName,
                 properties = properties)
     }
@@ -77,13 +77,31 @@ class LibraryModelReader : LibraryModelBaseVisitor<Node>() {
     }
 
     override fun visitFunArg(ctx: LibraryModelParser.FunArgContext): FunctionArgument =
-            FunctionArgument(name = ctx.argName().text, type = SemanticType(ctx.argType().text))
+            FunctionArgument(name = ctx.argName().text, type = visitSemanticType(ctx.argType().semanticType()))
 
     override fun visitStaticDecl(ctx: LibraryModelParser.StaticDeclContext): StaticDecl =
             StaticDecl(staticName = ctx.staticName()?.text ?: "")
 
-    override fun visitPropertyDecl(ctx: LibraryModelParser.PropertyDeclContext?): PropertyDecl =
-            PropertyDecl(key = ctx!!.propertyKey().text, value = ctx.propertyValue().text)
+    override fun visitPropertyDecl(ctx: LibraryModelParser.PropertyDeclContext): PropertyDecl =
+            PropertyDecl(key = ctx.propertyKey().text, value = ctx.propertyValue().text)
+
+    override fun visitSemanticType(ctx: LibraryModelParser.SemanticTypeContext): SemanticType =
+            when {
+                ctx.semanticType().size == 2 -> ComplexSemanticType(ctx.text, // TODO: Don't use text here
+                        enclosingType = visitSemanticType(ctx.semanticType(0)),
+                        innerType = visitSemanticType(ctx.semanticType(1)))
+                ctx.semanticType().size == 1 && ctx.arrayIdentifier() != null ->
+                    ComplexSemanticType(
+                            enclosingType = SimpleSemanticType("[]"),
+                            innerType = visitSemanticType(ctx.semanticType(0)),
+                            typeName = "${ctx.semanticType(0).text}[]")
+                ctx.semanticType().size == 1 && ctx.pointerIdentifier() != null ->
+                    ComplexSemanticType(
+                            enclosingType = SimpleSemanticType("*"),
+                            innerType = visitSemanticType(ctx.semanticType(0)),
+                            typeName = "${ctx.semanticType(0).text}*")
+                else -> SimpleSemanticType(ctx.text)
+            }
 }
 
 fun main(args: Array<String>) {

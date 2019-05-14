@@ -54,7 +54,24 @@ typeDecl
    ;
 
 semanticType
-   :   Identifier ('[]'|'*')*
+   :   semanticType '<' semanticType '>'
+   |   semanticType arrayIdentifier
+   |   semanticType pointerIdentifier
+   |   pureSemanticType
+   ;
+
+arrayIdentifier
+   :
+   '[]'
+   ;
+
+pointerIdentifier
+   :
+   '*'
+   ;
+
+pureSemanticType
+   : Identifier
    ;
 
 codeType
@@ -114,7 +131,7 @@ dstState
    ;
 
 automatonName
-   :   Identifier
+   :   semanticType
    ;
 
 extendableFlag
@@ -162,7 +179,7 @@ actionName
    ;
 
 entityName
-   :   Identifier
+   :   semanticType
    ;
 
 funName

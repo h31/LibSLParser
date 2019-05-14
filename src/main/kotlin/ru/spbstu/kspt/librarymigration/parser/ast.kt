@@ -24,7 +24,13 @@ interface Type {
     val typeName: String
 }
 
-data class SemanticType(override val typeName: String) : Node, Type
+interface SemanticType : Node, Type
+
+data class SimpleSemanticType(override val typeName: String) : SemanticType
+
+data class ComplexSemanticType(override val typeName: String,
+                               val enclosingType: SemanticType,
+                               val innerType: SemanticType) : SemanticType
 
 data class CodeType(override val typeName: String) : Node, Type
 

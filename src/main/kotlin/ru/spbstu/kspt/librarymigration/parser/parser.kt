@@ -59,7 +59,6 @@ class LibraryModelReader : LibraryModelBaseVisitor<Node>() {
             Converter(entity = visitSemanticType(ctx.destEntity().semanticType()), expression = ctx.converterExpression().text)
 
     override fun visitFunDecl(ctx: LibraryModelParser.FunDeclContext): FunctionDecl {
-        println(ctx.funArgs())
         val args = ctx.funArgs()?.funArg()?.map { visitFunArg(it) } ?: listOf()
         val actions = ctx.funProperties().map { visit(it) }.filterIsInstance<ActionDecl>()
         val staticName = ctx.funProperties().map { visit(it) }.filterIsInstance<StaticDecl>().singleOrNull()

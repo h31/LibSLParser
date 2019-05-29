@@ -16,7 +16,8 @@ open class NodeList<T>(val list: List<T>) : Node, List<T> by list
 data class Automaton(val name: SemanticType,
                      val states: List<StateDecl>,
                      val shifts: List<ShiftDecl>,
-                     val extendable: Boolean) : Node
+                     val extendable: Boolean,
+                     val associatedFunctions: List<FunctionDecl> = listOf()) : Node
 
 data class TypeDecl(val semanticType: SemanticType, val codeType: CodeType) : Node
 
@@ -26,13 +27,19 @@ interface Type {
 
 interface SemanticType : Node, Type
 
-data class SimpleSemanticType(override val typeName: String) : SemanticType
+data class SimpleSemanticType(override val typeName: String) : SemanticType {
+    override fun toString() = typeName
+}
 
 data class ComplexSemanticType(override val typeName: String,
                                val enclosingType: SemanticType,
-                               val innerType: SemanticType) : SemanticType
+                               val innerType: SemanticType) : SemanticType {
+    override fun toString() = typeName
+}
 
-data class CodeType(override val typeName: String) : Node, Type
+data class CodeType(override val typeName: String) : Node, Type {
+    override fun toString() = typeName
+}
 
 data class Converter(val entity: SemanticType, val expression: String) : Node
 

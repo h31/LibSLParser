@@ -17,6 +17,10 @@ fun SemanticType.isReference() = typeName !in primitiveSemanticTypes
 
 operator fun List<TypeDecl>.get(semanticType: SemanticType) = first { it.semanticType == semanticType }
 
+fun LibraryDecl.associateAutomataWithFuncs(): LibraryDecl {
+    return copy(automata = automata.map { automaton -> automaton.copy(associatedFunctions = this.functions.filter { it.entity == automaton.name }) })
+}
+
 fun LibraryDecl.addArrayTypeDecls(convertToCodeArrayType: (CodeType) -> CodeType): LibraryDecl {
     val arrayTypes = this.getArrayTypesFromFunctionDecls()
     val typeDecls = arrayTypes.map { arrayType ->

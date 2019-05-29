@@ -1,0 +1,56 @@
+libraryDecl(decl) ::= <<
+library <decl.name> {
+ <if(decl.imports)><imports(decl.imports)><endif>
+
+ <if(decl.types)><types(decl.types)><endif>
+
+ <if(decl.converters)><converters(decl.converters)><endif>
+
+ <decl.automata:{x | <automaton(x)>}; separator="\n">
+}
+>>
+
+imports(list) ::= <<
+imports {
+  <list:{x | <x>;}; separator="\n">
+}
+>>
+
+types(list) ::= <<
+types {
+  <list:{x | <x.semanticType.typeName> (<x.codeType.typeName>);}; separator="\n">
+}
+>>
+
+converters(list) ::= <<
+converters {
+  <list:{x | <x.entity.typeName> \<- <x.expression>;}; separator="\n">
+}
+>>
+
+automaton(a) ::= <<
+automaton <a.name> {
+  <states(a.states)>
+  <a.shifts:{x | <shift(x)>}; separator="\n">
+}
+<if(a.associatedFunctions)>
+
+<a.associatedFunctions:{x | <func(x)>}; separator="\n">
+<endif>
+>>
+
+states(list) ::= <<
+state <list:{x | <x.name>}; separator=", ">;
+>>
+
+shift(s) ::= <<
+shift <s.from> -> <s.to> (<s.functions; separator=", ">);
+>>
+
+funcs(list) ::= << <list:{f | func(x)}> >>
+
+func(f) ::= <<
+fun <f.entity.typeName>.<f.name>(<f.args:{x | <arg(x)>}; separator=", ">)<if(f.returnValue)>: <f.returnValue.typeName><endif>;
+>>
+
+arg(a) ::= "<a.name>: <a.type>"

@@ -4,6 +4,7 @@ interface Node
 
 data class LibraryDecl(val name: String,
                        val imports: List<String>,
+                       val includes: List<String>,
                        val automata: List<Automaton>,
                        val types: List<TypeDecl>,
                        val converters: List<Converter>,

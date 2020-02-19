@@ -18,8 +18,9 @@
 
     <distributionManagement>
         <repository>
-            <id>ssh-repository</id>
-            <url>scpexe://rock64/home/artyom/Repositories/ModelParser</url>
+            <id>github</id>
+            <name>GitHub h31 Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/h31/ModelParser</url>
         </repository>
     </distributionManagement>
 

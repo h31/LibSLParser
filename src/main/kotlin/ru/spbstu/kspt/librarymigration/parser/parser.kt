@@ -7,6 +7,7 @@ import ru.spbstu.kspt.librarymigration.modelreader.LibraryModelLexer
 import ru.spbstu.kspt.librarymigration.modelreader.LibraryModelParser
 import ru.spbstu.kspt.librarymigration.parser.edgemodel.EdgeModelConverter
 import java.io.InputStream
+import java.nio.file.Path
 
 /**
  * Created by artyom on 13.07.17.
@@ -23,6 +24,15 @@ class ModelParser {
     }
 
     fun postprocess(libraryDecl: LibraryDecl) = EdgeModelConverter().convert(libraryDecl)
+
+//    fun readIncludes(start: LibraryModelParser.StartContext, includesDir: Path) {
+//        for (section in start.description().includeSection()) {
+//            for (statement in section.includedStatement()) {
+//                val includedModelName = statement.includedName().text
+//                val modelPath = includesDir.resolve("$includedModelName.lsl")
+//            }
+//        }
+//    }
 }
 
 class LibraryModelReader : LibraryModelBaseVisitor<Node>() {
@@ -30,11 +40,12 @@ class LibraryModelReader : LibraryModelBaseVisitor<Node>() {
         val libraryName = ctx.libraryName().Identifier().text
         val desc = ctx.description()
         val imports = desc.importSection().singleOrNull()?.importedStatement()?.map { it.importedName().text } ?: listOf()
+        val includes = desc.includeSection().singleOrNull()?.includedStatement()?.map { it.includedName().text } ?: listOf()
         val automata = desc.automatonDescription().map { visitAutomatonDescription(it) }
         val typeList = desc.typesSection().single().typeDecl().map { visitTypeDecl(it) }
         val converters = desc.convertersSection().singleOrNull()?.converter()?.map { visitConverter(it) } ?: listOf()
         val functions = desc.funDecl().map { visitFunDecl(it) }
-        return LibraryDecl(name = libraryName, imports = imports, automata = automata, types = typeList,
+        return LibraryDecl(name = libraryName, imports = imports, includes = includes, automata = automata, types = typeList,
                 converters = converters, functions = functions)
     }
 

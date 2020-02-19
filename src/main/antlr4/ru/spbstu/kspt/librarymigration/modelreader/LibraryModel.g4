@@ -6,6 +6,7 @@ start
 
 description
    :   (importSection
+          |   includeSection
           |   typesSection
           |   convertersSection
           |   automatonDescription
@@ -75,15 +76,23 @@ pureSemanticType
    ;
 
 codeType
-   :   (primitiveType | complexType) ('[]')?
+   :   codeType '<' codeType '>'
+   |   codeType arrayIdentifier
+   |   codeType pointerIdentifier
+   |   typeUnit
    ;
 
-primitiveType
-   :   'primitive:' Identifier
+typeUnit
+   :   prefixedSemanticType
+   |   complexType
    ;
 
 complexType
    :   Identifier ('.' complexType)?
+   ;
+
+prefixedSemanticType
+   :   'sem:' pureSemanticType
    ;
 
 convertersSection

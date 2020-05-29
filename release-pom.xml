@@ -4,10 +4,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ru.spbstu.kspt.librarymigration</groupId>
   <artifactId>modelparser</artifactId>
-  <version>0.5</version>
+  <version>0.6</version>
   <scm>
     <connection>scm:git:https://github.com/h31/ModelParser</connection>
     <developerConnection>scm:git:https://github.com/h31/ModelParser</developerConnection>
+    <tag>modelparser-0.5</tag>
   </scm>
   <distributionManagement>
     <repository>
@@ -173,7 +174,7 @@
       </testResource>
     </testResources>
     <directory>target</directory>
-    <finalName>modelparser-0.5</finalName>
+    <finalName>modelparser-0.6</finalName>
     <plugins>
       <plugin>
         <groupId>org.jetbrains.kotlin</groupId>

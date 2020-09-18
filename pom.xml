@@ -18,9 +18,8 @@
 
     <distributionManagement>
         <repository>
-            <id>github</id>
-            <name>GitHub h31 Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/h31/ModelParser</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </distributionManagement>
 

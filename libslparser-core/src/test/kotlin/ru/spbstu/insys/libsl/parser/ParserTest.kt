@@ -1,22 +1,24 @@
 package ru.spbstu.insys.libsl.parser
 
-import java.net.URL
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class ParserTest {
-    fun getZ3Model(): String =
-            URL("https://raw.githubusercontent.com/h31/LibraryLink/master/models/library/Z3.lsl").readText()
+    private fun readResourceAsString(name: String) = this.javaClass.classLoader.getResourceAsStream(name)
 
-    private fun resourceReader(name: String) = this.javaClass.classLoader.getResourceAsStream(name).bufferedReader()
+    private fun makeDiff(expected: String, actual: String) = expected.lineSequence().zip(actual.lineSequence())
+        .filter { (source, result) -> source != result }
+        .map { (source, result) -> "-$source\n+$result" }
+        .joinToString("\n")
 
-//    @Test
+    @Test
     fun z3test() {
-        val sourceText = getZ3Model()
-        val parsedModel = ModelParser().parse(sourceText.byteInputStream())
+        val sourceModel = assertNotNull(readResourceAsString("prettyprinter/Z3.lsl"))
+        val parsedModel = ModelParser().parse(sourceModel)
         val text = parsedModel.print()
-        val expected = resourceReader("prettyprinter/Z3.lsl").readText()
-        if (expected != text) {
-            expected.lineSequence().zip(text.lineSequence()).forEach { (source, result) -> if (source != result) println("-$source\n+$result") }
-//            fail("Not equal")
-        }
+        assertEquals("library Z3 {", text.lineSequence().first())
+        val expected = assertNotNull(readResourceAsString("prettyprinter/Z3.lsl")).bufferedReader().readText()
+        assertEquals(expected, text, message = makeDiff(expected, text))
     }
 }

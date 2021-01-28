@@ -3,30 +3,24 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ru.spbstu.kspt.librarymigration</groupId>
-    <artifactId>ModelParser</artifactId>
-    <version>0.10-SNAPSHOT</version>
+    <groupId>com.github.h31</groupId>
+    <artifactId>libslparser</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <scm>
         <connection>
-            scm:git:https://github.com/h31/ModelParser
+            scm:git:https://github.com/h31/LibSLParser
         </connection>
         <developerConnection>
-            scm:git:https://github.com/h31/ModelParser
+            scm:git:https://github.com/h31/LibSLParser
         </developerConnection>
-      <tag>modelparser-0.5</tag>
+      <url>https://github.com/h31/LibSLParser</url>
     </scm>
 
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub h31 Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/h31/ModelParser</url>
-        </repository>
-    </distributionManagement>
-
     <properties>
-        <kotlin.version>1.3.31</kotlin.version>
-        <junit.version>4.12</junit.version>
+        <kotlin.version>1.4.21</kotlin.version>
+        <junit.version>5.7.0</junit.version>
+        <antlr.version>4.9.1</antlr.version>
+        <st4.version>4.3.1</st4.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,44 +32,41 @@
             <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
-
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4</artifactId>
+            <version>${antlr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>ST4</artifactId>
+            <version>${st4.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test-junit</artifactId>
+            <artifactId>kotlin-test-junit5</artifactId>
             <version>${kotlin.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4</artifactId>
-            <version>4.7.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>ST4</artifactId>
-            <version>4.1</version>
-        </dependency>
     </dependencies>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jcenter</id>
+            <name>JCenter</name>
+            <url>https://jcenter.bintray.com/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
         <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
-
-        <extensions>
-            <!-- Enabling the use of SSH -->
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh-external</artifactId>
-                <version>3.2.0</version>
-            </extension>
-        </extensions>
-
 
         <plugins>
             <plugin>
@@ -113,7 +104,7 @@
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.7.1</version>
+                <version>${antlr.version}</version>
                 <configuration>
                     <arguments>
                         <argument>
@@ -139,7 +130,7 @@
                 </configuration>
             </plugin>
 
-            <!-- <plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>3.2.1</version>
@@ -151,12 +142,12 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin> -->
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.0.0-M5</version>
             </plugin>
         </plugins>
     </build>

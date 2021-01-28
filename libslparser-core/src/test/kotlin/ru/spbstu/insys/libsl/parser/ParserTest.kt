@@ -18,7 +18,9 @@ class ParserTest {
         val parsedModel = ModelParser().parse(sourceModel)
         val text = parsedModel.print()
         assertEquals("library Z3 {", text.lineSequence().first())
-        val expected = assertNotNull(readResourceAsString("prettyprinter/Z3.lsl")).bufferedReader().readText()
+        val expected = assertNotNull(readResourceAsString("prettyprinter/Z3.lsl"))
+            .bufferedReader()
+            .use { it.readText() }
         assertEquals(expected, text, message = makeDiff(expected, text))
     }
 }

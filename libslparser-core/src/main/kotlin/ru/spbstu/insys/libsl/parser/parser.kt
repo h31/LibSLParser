@@ -3,6 +3,7 @@ package ru.spbstu.insys.libsl.parser
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import java.io.InputStream
+import java.nio.file.Path
 
 /**
  * Created by artyom on 13.07.17.
@@ -18,51 +19,62 @@ class ModelParser {
         return LibSLReader().visitStart(start)
     }
 
-//    fun postprocess(libraryDecl: LibraryDecl) = EdgeModelConverter().convert(libraryDecl)
-
-//    fun readIncludes(start: LibSLParser.StartContext, includesDir: Path) {
-//        for (section in start.description().includeSection()) {
-//            for (statement in section.includedStatement()) {
-//                val includedModelName = statement.includedName().text
-//                val modelPath = includesDir.resolve("$includedModelName.lsl")
-//            }
-//        }
-//    }
+    fun readIncludes(start: LibSLParser.StartContext, includesDir: Path) {
+        for (section in start.sections().includeSection()) {
+            for (statement in section.includedStatement()) {
+                val includedModelName = statement.includedName().text
+                val modelPath = includesDir.resolve("$includedModelName.lsl")
+            }
+        }
+    }
 }
 
-class LibSLReader : LibSLBaseVisitor<Node>() {
+private class LibSLReader : LibSLBaseVisitor<Node>() {
     override fun visitStart(ctx: LibSLParser.StartContext): LibraryDecl {
-        val libraryName = ctx.libraryName().Identifier().text
-        val desc = ctx.description()
-        val imports = desc.importSection().singleOrNull()?.importedStatement()?.map { it.importedName().text } ?: listOf()
-        val includes = desc.includeSection().singleOrNull()?.includedStatement()?.map { it.includedName().text } ?: listOf()
-        val automata = desc.automatonDescription().map { visitAutomatonDescription(it) }
-        val typeList = desc.typesSection().single().typeDecl().map { visitTypeDecl(it) }
-        val converters = desc.convertersSection().singleOrNull()?.converter()?.map { visitConverter(it) } ?: listOf()
-        val functions = desc.funDecl().map { visitFunDecl(it) }
-        return LibraryDecl(name = libraryName, imports = imports, includes = includes, automata = automata, types = typeList,
-                converters = converters, functions = functions)
+        val libraryName = ctx.libslHeaderSection().libraryName().Identifier().text
+        val sections = ctx.sections()
+        val imports =
+            sections.importSection().singleOrNull()?.importedStatement()?.map { it.importedName().text } ?: listOf()
+        val includes =
+            sections.includeSection().singleOrNull()?.includedStatement()?.map { it.includedName().text } ?: listOf()
+        val automata = sections.automatonDescription().map { visitAutomatonDescription(it) }
+        val typeList = sections.typesSection().single().typeDecl().map { visitTypeDecl(it) }
+        val converters =
+            sections.convertersSection().singleOrNull()?.converter()?.map { visitConverter(it) } ?: listOf()
+        val functions = sections.funDecl().map { visitFunDecl(it) }
+        return LibraryDecl(
+            name = libraryName, imports = imports, includes = includes, automata = automata, types = typeList,
+            converters = converters, functions = functions
+        )
     }
 
     override fun visitAutomatonDescription(ctx: LibSLParser.AutomatonDescriptionContext): Automaton {
         val states = ctx.stateDecl().flatMap { visitStateDecl(it) }
         val shifts = ctx.shiftDecl().map { visitShiftDecl(it) }
         val extendable = ctx.extendableFlag().any()
-        return Automaton(name = visitSemanticType(ctx.automatonName().semanticType()), states = states, shifts = shifts, extendable = extendable)
+        return Automaton(
+            name = visitSemanticType(ctx.automatonName().semanticType()),
+            states = states,
+            shifts = shifts,
+            extendable = extendable
+        )
     }
 
     override fun visitTypeDecl(ctx: LibSLParser.TypeDeclContext): TypeDecl =
-            TypeDecl(semanticType = visitSemanticType(ctx.semanticType()), codeType = CodeType(ctx.codeType().text))
+        TypeDecl(semanticType = visitSemanticType(ctx.semanticType()), codeType = CodeType(ctx.codeType().text))
 
     override fun visitStateDecl(ctx: LibSLParser.StateDeclContext): NodeList<StateDecl> =
-            NodeList(ctx.stateName().map { StateDecl(name = it.text) })
+        NodeList(ctx.stateName().map { StateDecl(name = it.text) })
 
     override fun visitShiftDecl(ctx: LibSLParser.ShiftDeclContext): ShiftDecl =
-            ShiftDecl(from = ctx.srcState().text, to = ctx.dstState().text,
-                    functions = ctx.funName().map { it.text })
+        ShiftDecl(from = ctx.srcState().text, to = ctx.dstState().text,
+            functions = ctx.funName().map { it.text })
 
     override fun visitConverter(ctx: LibSLParser.ConverterContext): Converter =
-            Converter(entity = visitSemanticType(ctx.destEntity().semanticType()), expression = ctx.converterExpression().text)
+        Converter(
+            entity = visitSemanticType(ctx.destEntity().semanticType()),
+            expression = ctx.converterExpression().text
+        )
 
     override fun visitFunDecl(ctx: LibSLParser.FunDeclContext): FunctionDecl {
         val args = ctx.funArgs()?.funArg()?.map { visitFunArg(it) } ?: listOf()
@@ -70,11 +82,14 @@ class LibSLReader : LibSLBaseVisitor<Node>() {
         val staticName = ctx.funProperties().map { visit(it) }.filterIsInstance<StaticDecl>().singleOrNull()
         val properties = ctx.funProperties().map { visit(it) }.filterIsInstance<PropertyDecl>()
         return FunctionDecl(entity = visitSemanticType(ctx.entityName().semanticType()),
-                name = ctx.funName().text,
-                args = args, actions = actions,
-                returnValue = if (ctx.funReturnType() != null) visitSemanticType(ctx.funReturnType().semanticType()) else null,
-                staticName = staticName,
-                properties = properties)
+            name = ctx.funName().text,
+            args = args, actions = actions,
+            returnValue = ctx.funReturnType()?.run { visitSemanticType(semanticType()) },
+            returnValueAnnotations = ctx.funReturnType()?.run {
+                annotation().map { it.annotationName().text }
+            } ?: listOf(),
+            staticName = staticName,
+            properties = properties)
     }
 
     override fun visitActionDecl(ctx: LibSLParser.ActionDeclContext): Node {
@@ -82,32 +97,37 @@ class LibSLReader : LibSLBaseVisitor<Node>() {
     }
 
     override fun visitFunArg(ctx: LibSLParser.FunArgContext): FunctionArgument =
-            FunctionArgument(name = ctx.argName().text, type = visitSemanticType(ctx.argType().semanticType()))
+        FunctionArgument(
+            name = ctx.argName().text,
+            type = visitSemanticType(ctx.argType().semanticType()),
+            annotations = ctx.annotation().map { it.annotationName().text }
+        )
 
     override fun visitStaticDecl(ctx: LibSLParser.StaticDeclContext): StaticDecl =
-            StaticDecl(staticName = ctx.staticName()?.text ?: "")
+        StaticDecl(staticName = ctx.staticName()?.text ?: "")
 
     override fun visitPropertyDecl(ctx: LibSLParser.PropertyDeclContext): PropertyDecl =
-            PropertyDecl(key = ctx.propertyKey().text, value = ctx.propertyValue().text)
+        PropertyDecl(key = ctx.propertyKey().text, value = ctx.propertyValue().text)
 
     override fun visitSemanticType(ctx: LibSLParser.SemanticTypeContext): SemanticType =
-            when {
-                ctx.semanticType().size == 2 -> ComplexSemanticType(ctx.text, // TODO: Don't use text here
-                        enclosingType = visitSemanticType(ctx.semanticType(0)),
-                        innerType = visitSemanticType(ctx.semanticType(1)))
-                ctx.semanticType().size == 1 && ctx.arrayIdentifier() != null ->
-                    ComplexSemanticType(
-                            enclosingType = SimpleSemanticType("[]"),
-                            innerType = visitSemanticType(ctx.semanticType(0)),
-                            typeName = "${ctx.semanticType(0).text}[]")
-                ctx.semanticType().size == 1 && ctx.pointerIdentifier() != null ->
-                    ComplexSemanticType(
-                            enclosingType = SimpleSemanticType("*"),
-                            innerType = visitSemanticType(ctx.semanticType(0)),
-                            typeName = "${ctx.semanticType(0).text}*")
-                else -> SimpleSemanticType(ctx.text)
-            }
-}
-
-fun main(args: Array<String>) {
+        when {
+            ctx.semanticType().size == 2 -> ComplexSemanticType(
+                ctx.text, // TODO: Don't use text here
+                enclosingType = visitSemanticType(ctx.semanticType(0)),
+                innerType = visitSemanticType(ctx.semanticType(1))
+            )
+            ctx.semanticType().size == 1 && ctx.arrayIdentifier() != null ->
+                ComplexSemanticType(
+                    enclosingType = SimpleSemanticType("[]"),
+                    innerType = visitSemanticType(ctx.semanticType(0)),
+                    typeName = "${ctx.semanticType(0).text}[]"
+                )
+            ctx.semanticType().size == 1 && ctx.pointerIdentifier() != null ->
+                ComplexSemanticType(
+                    enclosingType = SimpleSemanticType("*"),
+                    innerType = visitSemanticType(ctx.semanticType(0)),
+                    typeName = "${ctx.semanticType(0).text}*"
+                )
+            else -> SimpleSemanticType(ctx.text)
+        }
 }

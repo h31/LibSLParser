@@ -1,10 +1,14 @@
 grammar LibSL;
 
 start
-   :   'library' libraryName '{' description '}' EOF
+   :   libslHeaderSection sections EOF
    ;
 
-description
+libslHeaderSection
+   :   'library' libraryName ';'
+   ;
+
+sections
    :   (importSection
           |   includeSection
           |   typesSection
@@ -12,13 +16,6 @@ description
           |   automatonDescription
           |   funDecl)+
    ;
-
-//section
-//   :   (typesSection
-//   |   convertersSection
-//   |   automatonDescription
-//   |   funDecl)
-//   ;
 
 includeSection
    :   'includes' '{' includedStatement+ '}'
@@ -148,7 +145,7 @@ extendableFlag
    ;
 
 funDecl
-   :   'fun' entityName '.' funName '(' funArgs? ')' (':' funReturnType)? (';' | '{' funProperties* '}')
+   :   'fun' (entityName '.')? funName '(' funArgs? ')' (':' funReturnType)? (';' | '{' funProperties* '}')
    ;
 
 funProperties
@@ -201,11 +198,18 @@ funArgs
    ;
 
 funArg
-   :   argName ':' argType
+   :   annotation* argName ':' argType
    ;
 
+annotation
+   :   '@' annotationName
+   ;
+
+annotationName
+   :   Identifier;
+
 argName
-   : Identifier
+   :   Identifier
    ;
 
 argType
@@ -213,7 +217,7 @@ argType
    ;
 
 funReturnType
-   :   semanticType
+   :   annotation* semanticType
    ;
 
 containsTreeType

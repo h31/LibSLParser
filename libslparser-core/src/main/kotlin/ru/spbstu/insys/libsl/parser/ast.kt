@@ -12,8 +12,6 @@ data class LibraryDecl(val name: String,
 
 open class NodeList<T>(val list: List<T>) : Node, List<T> by list
 
-//class TypeList(list: List<Node>) : NodeList(list)
-
 data class Automaton(val name: SemanticType,
                      val states: List<StateDecl>,
                      val shifts: List<ShiftDecl>,
@@ -48,6 +46,7 @@ data class FunctionDecl(val entity: SemanticType, val name: String,
                         val args: List<FunctionArgument>,
                         val actions: List<ActionDecl>,
                         val returnValue: SemanticType?,
+                        val returnValueAnnotations: List<String>,
                         val staticName: StaticDecl?,
                         val properties: List<PropertyDecl>,
                         val builtin: Boolean = false,
@@ -55,7 +54,7 @@ data class FunctionDecl(val entity: SemanticType, val name: String,
 
 data class ActionDecl(val name: String, val args: List<String>) : Node
 
-data class FunctionArgument(val name: String, val type: SemanticType) : Node
+data class FunctionArgument(val name: String, val type: SemanticType, val annotations: List<String>) : Node
 
 data class StateDecl(val name: String) : Node
 

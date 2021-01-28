@@ -2,7 +2,10 @@ package ru.spbstu.insys.libsl.parser.edgemodel
 
 import ru.spbstu.insys.libsl.parser.FunctionDecl
 import ru.spbstu.insys.libsl.parser.LibraryDecl
+import ru.spbstu.insys.libsl.parser.ModelParser
 import ru.spbstu.insys.libsl.parser.ShiftDecl
+
+fun ModelParser.postprocess(libraryDecl: LibraryDecl) = EdgeModelConverter().convert(libraryDecl)
 
 class EdgeModelConverter {
     val machines = mutableMapOf<String, StateMachine>()

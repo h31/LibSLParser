@@ -14,7 +14,7 @@ class EdgeModelConverter {
 
     fun convert(libraryDecl: LibraryDecl): Library {
         libraryDecl.types.map { StateMachine(name = it.semanticType.typeName) }.associateByTo(machines, StateMachine::name)
-        libraryDecl.functions.associateByTo(functions, { Pair(it.entity.typeName, it.name) })
+        libraryDecl.functions.associateByTo(functions, { Pair(it.entity.type.typeName, it.name) })
         for (fsm in libraryDecl.automata) {
             val machine = machines[fsm.name.typeName]!!
             for (state in fsm.states) {
@@ -51,7 +51,7 @@ class EdgeModelConverter {
                 hasReturnValue = functionDecl.returnValue != null,
                 isStatic = functionDecl.staticName != null)
         if (functionDecl.returnValue != null) {
-            LinkedEdge(edge = edge, dst = machines[functionDecl.returnValue!!.typeName]!!.getDefaultState())
+            LinkedEdge(edge = edge, dst = machines[functionDecl.returnValue!!.type.typeName]!!.getDefaultState())
         }
         return edge
     }

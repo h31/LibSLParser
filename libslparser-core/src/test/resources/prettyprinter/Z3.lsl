@@ -30,7 +30,6 @@ automaton Z3_config {
 }
 
 fun Z3_config.Z3_mk_config(): Z3_config;
-
 fun Z3_mk_context(@handle cfg: Z3_config): Z3_context;
 fun Z3_del_config(@handle cfg: Z3_config);
 fun Z3_set_param_value(@handle cfg: Z3_config, param_id: Char[], param_value: Char[]);

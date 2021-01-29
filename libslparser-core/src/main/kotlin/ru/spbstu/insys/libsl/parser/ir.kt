@@ -17,8 +17,10 @@ fun SemanticType.isReference() = typeName !in primitiveSemanticTypes
 
 operator fun List<TypeDecl>.get(semanticType: SemanticType) = first { it.semanticType == semanticType }
 
-fun LibraryDecl.associateAutomataWithFuncs(): LibraryDecl {
-    return copy(automata = automata.map { automaton -> automaton.copy(associatedFunctions = this.functions.filter { it.entity == automaton.name }) })
+fun LibraryDecl.associateAutomataWithFunctions(): LibraryDecl {
+    return copy(automata = automata.map { automaton ->
+        automaton.copy(associatedFunctions = this.functions.filter { it.entity.type == automaton.name })
+    })
 }
 
 fun LibraryDecl.addArrayTypeDecls(convertToCodeArrayType: (CodeType) -> CodeType): LibraryDecl {
@@ -69,8 +71,12 @@ fun LibraryDecl.generateHandlersForArrayAndPointerTypes(): LibraryDecl {
         val itemType = (arrayType.semanticType as ComplexSemanticType).innerType // getItemType(type, types) TODO: Dirty
         val codeType = this.types[itemType].codeType.typeName //getArrayType(itemType)
         val baseFunctionDecl = FunctionDecl(
-            entity = arrayType.semanticType, name = "", args = listOf(),
-            actions = listOf(), returnValue = null, returnValueAnnotations = listOf(),
+            entity = FunctionEntityDecl(
+                arrayType.semanticType,
+                FunctionEntityDecl.FunctionEntityDeclStyle.EXPLICIT_BEFORE_NAME
+            ),
+            name = "", args = listOf(),
+            actions = listOf(), returnValue = null,
             staticName = null, properties = listOf(), builtin = true
         )
         val set = baseFunctionDecl.copy(name = "set<$codeType>")
@@ -93,7 +99,7 @@ fun LibraryDecl.addDefaultStates(): LibraryDecl =
 fun LibraryDecl.addMissingAutomata(): LibraryDecl {
     val existingAutomataNames = automata.map { it.name }
     val generatedAutomata = functions
-        .filter { it.entity !in existingAutomataNames }
-        .map { Automaton(name = it.entity, states = defaultStates, shifts = listOf(), extendable = false) }
+        .filter { it.entity.type !in existingAutomataNames }
+        .map { Automaton(name = it.entity.type, states = defaultStates, shifts = listOf(), extendable = false) }
     return this.copy(automata = automata + generatedAutomata)
 }

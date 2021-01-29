@@ -46,10 +46,14 @@ shift(s) ::= <<
 shift <s.from> -> <s.to> (<s.functions; separator=", ">);
 >>
 
-funcs(list) ::= << <list:{f | func(x)}> >>
+funcs(list) ::= "<list:{f | func(x)}>"
 
 func(f) ::= <<
-fun <f.entity.typeName>.<f.name>(<f.args:{x | <arg(x)>}; separator=", ">)<if(f.returnValue)>: <f.returnValue.typeName><endif>;
+fun <funcEntityType(f.entity)><f.name>(<f.args:{x | <arg(x)>}; separator=", ">)<if(f.returnValue)>: <f.returnValue.type.typeName><endif>;
 >>
 
-arg(a) ::= "<a.name>: <a.type>"
+funcEntityType(entity) ::= "<if(entity.declStyle.explicit)><entity.type.typeName>.<endif>"
+
+arg(a) ::= "<a.annotations:{f | <annotation(f)>}><a.name>: <a.type>"
+
+annotation(a) ::= "@<a> "

@@ -81,7 +81,7 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
         val actions = ctx.funProperties().map { visit(it) }.filterIsInstance<ActionDecl>()
         val staticName = ctx.funProperties().map { visit(it) }.filterIsInstance<StaticDecl>().singleOrNull()
         val properties = ctx.funProperties().map { visit(it) }.filterIsInstance<PropertyDecl>()
-        return FunctionDecl(entity = visitSemanticType(ctx.entityName().semanticType()),
+        return FunctionDecl(entity = findFunctionEntity(ctx, args),
             name = ctx.funName().text,
             args = args, actions = actions,
             returnValue = ctx.funReturnType()?.run { visitSemanticType(semanticType()) },
@@ -108,6 +108,16 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
 
     override fun visitPropertyDecl(ctx: LibSLParser.PropertyDeclContext): PropertyDecl =
         PropertyDecl(key = ctx.propertyKey().text, value = ctx.propertyValue().text)
+
+    private fun findFunctionEntity(func: LibSLParser.FunDeclContext, args: List<FunctionArgument>): SemanticType {
+        val explicitEntity = func.entityName()
+        return if (explicitEntity != null) {
+            visitSemanticType(explicitEntity.semanticType())
+        } else {
+            args.singleOrNull { it.annotations.contains("handle") }?.type
+                ?: error("No @handle argument in function ${func.text}")
+        }
+    }
 
     override fun visitSemanticType(ctx: LibSLParser.SemanticTypeContext): SemanticType =
         when {

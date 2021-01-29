@@ -30,9 +30,10 @@ automaton Z3_config {
 }
 
 fun Z3_config.Z3_mk_config(): Z3_config;
-fun Z3_config.Z3_mk_context(cfg: self): Z3_context;
-fun Z3_config.Z3_del_config(cfg: self);
-fun Z3_config.Z3_set_param_value(cfg: self, param_id: Char[], param_value: Char[]);
+
+fun Z3_mk_context(@handle cfg: Z3_config): Z3_context;
+fun Z3_del_config(@handle cfg: Z3_config);
+fun Z3_set_param_value(@handle cfg: Z3_config, param_id: Char[], param_value: Char[]);
 
 automaton Z3_context {
     state Constructed;
@@ -44,42 +45,42 @@ automaton Z3_context {
     shift Constructed -> Closed (Z3_del_context);
 }
 
-fun Z3_context.Z3_mk_bool_sort(cfg: self): Z3_sort;
-fun Z3_context.Z3_mk_int_symbol(cfg: self, i: Int): Z3_symbol;
-fun Z3_context.Z3_mk_const(cfg: self, s: Z3_symbol, ty: Z3_sort): Z3_ast;
-fun Z3_context.Z3_mk_int(c: self, v: Int, ty: Z3_sort): Z3_ast;
-fun Z3_context.Z3_mk_not(cfg: self, a: Z3_ast): Z3_ast;
-fun Z3_context.Z3_mk_iff(cfg: self, t1: Z3_ast, t2: Z3_ast): Z3_ast;
-fun Z3_context.Z3_mk_iff(cfg: self, t1: Z3_ast, t2: Z3_ast): Z3_ast;
-fun Z3_context.Z3_mk_lt(c: self, t1: Z3_ast, t2: Z3_ast): Z3_ast;
-fun Z3_context.Z3_mk_gt(c: self, t1: Z3_ast, t2: Z3_ast): Z3_ast;
-fun Z3_context.Z3_mk_eq(c: self, l: Z3_ast, r: Z3_ast): Z3_ast;
-fun Z3_context.Z3_mk_and(cfg: self, num_args: Int, args: Z3_ast[]): Z3_ast;
-fun Z3_context.Z3_mk_or(cfg: self, num_args: Int, args: Z3_ast[]): Z3_ast;
-fun Z3_context.Z3_mk_add(c: self, num_args: Int, args: Z3_ast[]): Z3_ast;
-fun Z3_context.Z3_mk_solver(cfg: self): Z3_solver;
-fun Z3_context.Z3_solver_inc_ref(cfg: self, s: Z3_solver);
-fun Z3_context.Z3_solver_dec_ref(cfg: self, s: Z3_solver);
-fun Z3_context.Z3_solver_assert(cfg: self, s: Z3_solver, a: Z3_ast);
-fun Z3_context.Z3_solver_check(cfg: self, s: Z3_solver): Int;
-fun Z3_context.Z3_solver_check_assumptions(c: self, s: Z3_solver, num_assumptions: Int, assumptions: Z3_ast[]): Int;
-fun Z3_context.Z3_solver_get_unsat_core(c: self, s: Z3_solver): Z3_ast_vector;
-fun Z3_context.Z3_mk_string_symbol(cfg: self, s: Char[]): Z3_symbol;
-fun Z3_context.Z3_mk_int_sort(c: self): Z3_sort;
-fun Z3_context.Z3_solver_get_model(c: self, s: Z3_solver): Z3_model;
-fun Z3_context.Z3_model_inc_ref(c: self, m: Z3_model);
-fun Z3_context.Z3_model_dec_ref(c: self, m: Z3_model);
-fun Z3_context.Z3_set_error_handler(c: self, h: Z3_error_handler);
-fun Z3_context.Z3_model_to_string(c: self, m: Z3_model): const<Char[]>;
-fun Z3_context.Z3_model_get_num_consts(c: self, m: Z3_model): Int;
-fun Z3_context.Z3_model_get_const_decl(c: self, m: Z3_model, i: Int): Z3_func_decl;
-fun Z3_context.Z3_get_decl_name(c: self, d: Z3_func_decl): Z3_symbol;
-fun Z3_context.Z3_mk_app(c: self, d: Z3_func_decl, num_args: Int, args: Z3_ast[]): Z3_ast;
-fun Z3_context.Z3_model_eval(c: self, m: Z3_model, t: Z3_ast, model_completion: Boolean, v: Z3_ast): Boolean;
-fun Z3_context.Z3_del_context(cfg: self);
-fun Z3_context.Z3_get_symbol_kind(cfg: self, s: Z3_symbol): Int;
-fun Z3_context.Z3_get_symbol_int(cfg: self, s: Z3_symbol): Int;
-fun Z3_context.Z3_get_symbol_string(cfg: self, s: Z3_symbol): const<Char[]>;
+fun Z3_mk_bool_sort(@handle ctx: Z3_context): Z3_sort;
+fun Z3_mk_int_symbol(@handle ctx: Z3_context, i: Int): Z3_symbol;
+fun Z3_mk_const(@handle ctx: Z3_context, s: Z3_symbol, ty: Z3_sort): Z3_ast;
+fun Z3_mk_int(@handle c: Z3_context, v: Int, ty: Z3_sort): Z3_ast;
+fun Z3_mk_not(@handle ctx: Z3_context, a: Z3_ast): Z3_ast;
+fun Z3_mk_iff(@handle ctx: Z3_context, t1: Z3_ast, t2: Z3_ast): Z3_ast;
+fun Z3_mk_iff(@handle ctx: Z3_context, t1: Z3_ast, t2: Z3_ast): Z3_ast;
+fun Z3_mk_lt(@handle c: Z3_context, t1: Z3_ast, t2: Z3_ast): Z3_ast;
+fun Z3_mk_gt(@handle c: Z3_context, t1: Z3_ast, t2: Z3_ast): Z3_ast;
+fun Z3_mk_eq(@handle c: Z3_context, l: Z3_ast, r: Z3_ast): Z3_ast;
+fun Z3_mk_and(@handle ctx: Z3_context, num_args: Int, args: Z3_ast[]): Z3_ast;
+fun Z3_mk_or(@handle ctx: Z3_context, num_args: Int, args: Z3_ast[]): Z3_ast;
+fun Z3_mk_add(@handle c: Z3_context, num_args: Int, args: Z3_ast[]): Z3_ast;
+fun Z3_mk_solver(@handle ctx: Z3_context): Z3_solver;
+fun Z3_solver_inc_ref(@handle ctx: Z3_context, s: Z3_solver);
+fun Z3_solver_dec_ref(@handle ctx: Z3_context, s: Z3_solver);
+fun Z3_solver_assert(@handle ctx: Z3_context, s: Z3_solver, a: Z3_ast);
+fun Z3_solver_check(@handle ctx: Z3_context, s: Z3_solver): Int;
+fun Z3_solver_check_assumptions(@handle c: Z3_context, s: Z3_solver, num_assumptions: Int, assumptions: Z3_ast[]): Int;
+fun Z3_solver_get_unsat_core(@handle c: Z3_context, s: Z3_solver): Z3_ast_vector;
+fun Z3_mk_string_symbol(@handle ctx: Z3_context, s: Char[]): Z3_symbol;
+fun Z3_mk_int_sort(@handle c: Z3_context): Z3_sort;
+fun Z3_solver_get_model(@handle c: Z3_context, s: Z3_solver): Z3_model;
+fun Z3_model_inc_ref(@handle c: Z3_context, m: Z3_model);
+fun Z3_model_dec_ref(@handle c: Z3_context, m: Z3_model);
+fun Z3_set_error_handler(@handle c: Z3_context, h: Z3_error_handler);
+fun Z3_model_to_string(@handle c: Z3_context, m: Z3_model): const<Char[]>;
+fun Z3_model_get_num_consts(@handle c: Z3_context, m: Z3_model): Int;
+fun Z3_model_get_const_decl(@handle c: Z3_context, m: Z3_model, i: Int): Z3_func_decl;
+fun Z3_get_decl_name(@handle c: Z3_context, d: Z3_func_decl): Z3_symbol;
+fun Z3_mk_app(@handle c: Z3_context, d: Z3_func_decl, num_args: Int, args: Z3_ast[]): Z3_ast;
+fun Z3_model_eval(@handle c: Z3_context, m: Z3_model, t: Z3_ast, model_completion: Boolean, v: Z3_ast): Boolean;
+fun Z3_del_context(@handle ctx: Z3_context);
+fun Z3_get_symbol_kind(@handle ctx: Z3_context, s: Z3_symbol): Int;
+fun Z3_get_symbol_int(@handle ctx: Z3_context, s: Z3_symbol): Int;
+fun Z3_get_symbol_string(@handle ctx: Z3_context, s: Z3_symbol): const<Char[]>;
 
 automaton Z3_sort {
     state Constructed;

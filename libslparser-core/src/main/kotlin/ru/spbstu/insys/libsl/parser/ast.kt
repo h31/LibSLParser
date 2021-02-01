@@ -12,7 +12,7 @@ data class LibraryDecl(
     val functions: List<FunctionDecl>
 ) : Node
 
-open class NodeList<T>(val list: List<T>) : Node, List<T> by list
+open class NodeList<T>(private val list: List<T>) : Node, List<T> by list
 
 data class Automaton(
     val name: SemanticType,

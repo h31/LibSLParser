@@ -118,7 +118,7 @@ data class State(val name: String,
         for (machine in library.stateMachines) {
             for (state in machine.states) {
                 if (state == this) {
-                    return machine;
+                    return machine
                 }
             }
         }

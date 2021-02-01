@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.spbstu.insys.libsl.parser.LibraryDecl;
 import ru.spbstu.insys.libsl.parser.ModelParser;
-import ru.spbstu.insys.libsl.parser.PrettyprinterKt;
+import ru.spbstu.insys.libsl.parser.PrettyPrinter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ParserTestJava {
     private InputStream readResourceAsString(String name) {
-        return ParserTest.class.getResourceAsStream(name);
+        return ParserTestJava.class.getResourceAsStream(name);
     }
 
     @Test
@@ -26,7 +26,7 @@ public class ParserTestJava {
             assertNotNull(sourceModel);
             parsedModel = new ModelParser().parse(sourceModel);
         }
-        String text = PrettyprinterKt.print(parsedModel);
+        String text = PrettyPrinter.print(parsedModel);
         assertEquals("library Z3;", text.substring(0, text.indexOf('\n')));
         Assertions.assertTrue(parsedModel.getFunctions().stream().anyMatch(func -> func.getName().equals("Z3_mk_bool_sort")));
         InputStreamReader modelStreamReader = new InputStreamReader(readResourceAsString("/prettyprinter/Z3.lsl"));

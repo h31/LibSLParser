@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.h31</groupId>
     <artifactId>libslparser</artifactId>
     <packaging>pom</packaging>
-    <version>0.11-SNAPSHOT</version>
+    <version>0.11</version>
     <scm>
         <connection>
             scm:git:https://github.com/h31/LibSLParser
@@ -16,7 +15,7 @@
             scm:git:https://github.com/h31/LibSLParser
         </developerConnection>
         <url>https://github.com/h31/LibSLParser</url>
-        <tag>HEAD</tag>
+        <tag>libslparser-0.11</tag>
     </scm>
     <modules>
         <module>libslparser-core</module>

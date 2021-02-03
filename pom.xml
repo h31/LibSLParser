@@ -6,7 +6,7 @@
     <groupId>com.github.h31</groupId>
     <artifactId>libslparser</artifactId>
     <packaging>pom</packaging>
-    <version>0.11</version>
+    <version>0.12-SNAPSHOT</version>
     <scm>
         <connection>
             scm:git:https://github.com/h31/LibSLParser
@@ -15,7 +15,7 @@
             scm:git:https://github.com/h31/LibSLParser
         </developerConnection>
         <url>https://github.com/h31/LibSLParser</url>
-        <tag>libslparser-0.11</tag>
+        <tag>HEAD</tag>
     </scm>
     <modules>
         <module>libslparser-core</module>

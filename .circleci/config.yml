@@ -9,4 +9,5 @@ workflows:
       - maven/test:
           test_results_path: libslparser-tests/target/surefire-reports
           executor:
+            name: maven/default
             tag: "8.0"

@@ -28,18 +28,11 @@
         <junit.version>5.7.0</junit.version>
         <antlr.version>4.9.1</antlr.version>
         <st4.version>4.3.1</st4.version>
+        <dokka.version>1.4.20</dokka.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>jcenter</id>
-            <name>JCenter</name>
-            <url>https://jcenter.bintray.com/</url>
-        </pluginRepository>
-    </pluginRepositories>
 
     <build>
         <plugins>

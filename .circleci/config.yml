@@ -8,3 +8,5 @@ workflows:
     jobs:
       - maven/test:
           test_results_path: libslparser-tests/target/surefire-reports
+          executor:
+            tag: "8.0"

@@ -7,7 +7,6 @@ workflows:
   maven_test:
     jobs:
       - maven/test:
-          maven_command: "mvn package"
           test_results_path: libslparser-tests/target/surefire-reports
           executor:
             name: maven/default

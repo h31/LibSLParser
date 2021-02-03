@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ParserTestJava {
+public class ParserJavaUsageTest {
     private InputStream readResourceAsString(String name) {
-        return ParserTestJava.class.getResourceAsStream(name);
+        return ParserJavaUsageTest.class.getResourceAsStream(name);
     }
 
     @Test

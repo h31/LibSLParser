@@ -1,5 +1,6 @@
 libraryDecl(decl) ::= <<
 library <decl.name>;
+
 <if(decl.imports)><imports(decl.imports)><endif>
 
 <if(decl.types)><types(decl.types)><endif>

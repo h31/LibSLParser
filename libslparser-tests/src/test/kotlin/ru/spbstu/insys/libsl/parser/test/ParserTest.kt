@@ -19,12 +19,12 @@ class ParserTest {
 
     @Test
     fun z3test() {
-        val sourceModel = assertNotNull(readResourceAsString("prettyprinter/Z3.lsl"))
+        val sourceModel = assertNotNull(readResourceAsString("models/Z3.lsl"))
         val parsedModel = ModelParser().parse(sourceModel)
         val text = parsedModel.print()
         assertEquals("library Z3;", text.lineSequence().first())
         assertTrue(parsedModel.functions.any { it.name == "Z3_mk_bool_sort" })
-        val expected = assertNotNull(readResourceAsString("prettyprinter/Z3.lsl"))
+        val expected = assertNotNull(readResourceAsString("models/Z3.lsl"))
             .bufferedReader()
             .use { it.readText() }
         assertEquals(expected, text, message = makeDiff(expected, text))
@@ -33,7 +33,7 @@ class ParserTest {
     @ParameterizedTest
     @ValueSource(strings = ["SocketServer", "Requests", "OkHttp", "HttpURLConnection"])
     fun modelParseTest(modelName: String) {
-        val sourceModel = assertNotNull(readResourceAsString("prettyprinter/$modelName.lsl"))
+        val sourceModel = assertNotNull(readResourceAsString("models/$modelName.lsl"))
         val parsedModel = ModelParser().parse(sourceModel)
         assertEquals(modelName, parsedModel.name)
     }

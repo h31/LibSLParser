@@ -1,9 +1,14 @@
 package ru.spbstu.insys.libsl.parser
 
+import java.nio.file.Path
+
 val primitiveSemanticTypes = listOf("String", "Int", "Char", "Boolean")
 
 fun LibraryDecl.getArrayTypesFromFunctionDecls(): Collection<ComplexSemanticType> =
     this.functions.flatMap { it.args }.map { it.type }.filterArrayTypes().toSet()
+
+fun LibraryDecl.readIncludes(includesDir: Path): List<Path> =
+    includes.map { includesDir.resolve("$it.lsl") }
 
 fun Collection<SemanticType>.filterArrayTypes() = filterIsInstance<ComplexSemanticType>().filter { it.isArray() }
 

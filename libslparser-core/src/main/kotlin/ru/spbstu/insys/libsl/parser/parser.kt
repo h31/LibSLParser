@@ -1,31 +1,28 @@
 package ru.spbstu.insys.libsl.parser
 
+import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import java.io.InputStream
-import java.nio.file.Path
+import java.io.Reader
 
 /**
  * Created by artyom on 13.07.17.
  */
 class ModelParser {
-    fun parse(stream: InputStream): LibraryDecl {
-        val charStream = CharStreams.fromStream(stream)
+    fun parse(stream: InputStream): LibraryDecl = parse(CharStreams.fromStream(stream))
+
+    fun parse(reader: Reader): LibraryDecl = parse(CharStreams.fromReader(reader))
+
+    fun parse(source: String): LibraryDecl = parse(CharStreams.fromString(source))
+
+    private fun parse(charStream: CharStream): LibraryDecl {
         val lexer = LibSLLexer(charStream)
         val tokenStream = CommonTokenStream(lexer)
         val parser = LibSLParser(tokenStream)
         val start = parser.start()
 
         return LibSLReader().visitStart(start)
-    }
-
-    fun readIncludes(start: LibSLParser.StartContext, includesDir: Path) {
-        for (section in start.sections().includeSection()) {
-            for (statement in section.includedStatement()) {
-                val includedModelName = statement.includedName().text
-                val modelPath = includesDir.resolve("$includedModelName.lsl")
-            }
-        }
     }
 }
 

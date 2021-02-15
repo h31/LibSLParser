@@ -22,14 +22,14 @@ public class ParserJavaUsageTest {
     @Test
     public void z3test() throws IOException {
         LibraryDecl parsedModel;
-        try (InputStream sourceModel = readResourceAsString("/prettyprinter/Z3.lsl")) {
+        try (InputStream sourceModel = readResourceAsString("/models/Z3.lsl")) {
             assertNotNull(sourceModel);
             parsedModel = new ModelParser().parse(sourceModel);
         }
         String text = PrettyPrinter.print(parsedModel);
         assertEquals("library Z3;", text.substring(0, text.indexOf('\n')));
         Assertions.assertTrue(parsedModel.getFunctions().stream().anyMatch(func -> func.getName().equals("Z3_mk_bool_sort")));
-        InputStreamReader modelStreamReader = new InputStreamReader(readResourceAsString("/prettyprinter/Z3.lsl"));
+        InputStreamReader modelStreamReader = new InputStreamReader(readResourceAsString("/models/Z3.lsl"));
         try (BufferedReader reader = new BufferedReader(modelStreamReader)) {
             String expected = reader.lines().collect(Collectors.joining("\n", "", "\n"));
             assertEquals(expected, text);

@@ -41,7 +41,7 @@ dependencies {
 
 ### Usage Examples
 
-* [Kotlin example](https://github.com/h31/LibSLParser/blob/master/libslparser-tests/src/test/kotlin/ru/spbstu/insys/libsl/parser/test/ParserTest.kt#L19)
+* [Kotlin example](https://github.com/h31/LibSLParser/blob/master/libslparser-tests/src/test/kotlin/ru/spbstu/insys/libsl/parser/test/ParserTest.kt#L22)
 * [Java example](https://github.com/h31/LibSLParser/blob/master/libslparser-tests/src/test/java/ru/spbstu/insys/libsl/parser/test/ParserJavaUsageTest.java#L23)
 
 ### Project Structure

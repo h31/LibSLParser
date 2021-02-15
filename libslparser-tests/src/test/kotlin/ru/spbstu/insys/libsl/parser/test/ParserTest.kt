@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import ru.spbstu.insys.libsl.parser.ModelParser
 import ru.spbstu.insys.libsl.parser.print
+import java.io.StringReader
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -36,5 +37,27 @@ class ParserTest {
         val sourceModel = assertNotNull(readResourceAsString("models/$modelName.lsl"))
         val parsedModel = ModelParser().parse(sourceModel)
         assertEquals(modelName, parsedModel.name)
+    }
+
+    @Test
+    fun parseFromStringTest() {
+        val model = "library test; types {A (B);} automaton Test {}"
+        val parsedModel = ModelParser().parse(model)
+        assertEquals("test", parsedModel.name)
+        assertEquals(1, parsedModel.types.size)
+        assertEquals("A", parsedModel.types.single().semanticType.typeName)
+        assertEquals("B", parsedModel.types.single().codeType.typeName)
+        assertEquals(1, parsedModel.automata.size)
+        assertEquals("Test", parsedModel.automata.single().name.typeName)
+    }
+
+    @Test
+    fun parseFromReaderTest() {
+        val model = "library test; types {A (B);} automaton Test {}"
+        val reader = StringReader(model)
+        val parsedModel = ModelParser().parse(reader)
+        assertEquals("test", parsedModel.name)
+        assertEquals(1, parsedModel.types.size)
+        assertEquals(1, parsedModel.automata.size)
     }
 }

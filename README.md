@@ -21,7 +21,7 @@ or in papers [1](https://link.springer.com/article/10.3103/S0146411618070027), [
 <dependency>
     <groupId>com.github.h31.LibSLParser</groupId>
     <artifactId>libslparser-core</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
 
@@ -35,7 +35,7 @@ allprojects {
 }
 ...
 dependencies {
-  implementation 'com.github.h31.LibSLParser:libslparser-core:1.0'
+  implementation 'com.github.h31.LibSLParser:libslparser-core:1.1'
 }
 ```
 

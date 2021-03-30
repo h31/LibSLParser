@@ -51,12 +51,17 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
         val extendable = ctx.extendableFlag().any()
         val javaPackageDecl = ctx.javapackage()
         val javaPackage = visitJavapackage(javaPackageDecl)
+        val statements = ctx.automatonStatement().map {
+                visitAutomatonStatement(it)
+            }
+            .filterIsInstance<AutomatonStatement>()
         return Automaton(
             javaPackage = javaPackage,
             name = visitSemanticType(ctx.automatonName().semanticType()),
             states = states,
             shifts = shifts,
-            extendable = extendable
+            extendable = extendable,
+            statements = statements
         )
     }
 
@@ -78,16 +83,21 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
 
     override fun visitFunDecl(ctx: LibSLParser.FunDeclContext): FunctionDecl {
         val args = ctx.funArgs()?.funArg()?.map { visitFunArg(it) } ?: listOf()
-        val actions = ctx.funProperties().map { visit(it) }.filterIsInstance<ActionDecl>()
-        val staticName = ctx.funProperties().map { visit(it) }.filterIsInstance<StaticDecl>().singleOrNull()
-        val properties = ctx.funProperties().map { visit(it) }.filterIsInstance<PropertyDecl>()
+
+        val statements = ctx.funProperties().map { visit(it) }
+
+        val actions = statements.filterIsInstance<ActionDecl>()
+        val staticName = statements.filterIsInstance<StaticDecl>().singleOrNull()
+        val properties = statements.filterIsInstance<PropertyDecl>()
+        val variableAssignments = statements.filterIsInstance<VariableAssignmentNew>()
         return FunctionDecl(
             entity = findFunctionEntity(ctx, args),
             name = ctx.funName().text,
             args = args, actions = actions,
             returnValue = visitFunReturnType(ctx.funReturnType()),
             staticName = staticName,
-            properties = properties
+            properties = properties,
+            variableAssignments = variableAssignments
         )
     }
 
@@ -157,5 +167,23 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
         if (ctx == null) return defaultPackageDeclaration
         val name = ctx.Identifier().joinToString(separator = ".") { part -> part.text }
         return JavaPackageDecl(name)
+    }
+
+    override fun visitAutomatonStatement(ctx: LibSLParser.AutomatonStatementContext?): Node {
+        return when {
+            ctx?.automatonVariableDecl() != null -> AutomatonVariableStatement(
+                ctx.automatonVariableDecl().Identifier().text,
+                ctx.automatonVariableDecl().semanticType().text
+            )
+            else -> error("unexpected statement type")
+        }
+    }
+
+    override fun visitVariableAssignment(ctx: LibSLParser.VariableAssignmentContext?): VariableAssignmentNew {
+        if (ctx == null) error("wrong assignment of variable")
+        return VariableAssignmentNew(
+            name = ctx.Identifier().text,
+            calleeAutomatonName = ctx.automatonName().text
+        )
     }
 }

@@ -71,7 +71,8 @@ fun LibraryDecl.addComplexTypesDecls(complexTypeConversion: Map<String, String>)
             name = type.semanticType,
             states = listOf(),
             shifts = listOf(),
-            extendable = false
+            extendable = false,
+            statements = listOf()
         )
     }
     return this.copy(types = this.types + typeDecls, automata = this.automata + automata)
@@ -91,7 +92,8 @@ fun LibraryDecl.generateHandlersForArrayAndPointerTypes(): LibraryDecl {
             ),
             name = "", args = listOf(),
             actions = listOf(), returnValue = null,
-            staticName = null, properties = listOf(), builtin = true
+            staticName = null, properties = listOf(), builtin = true,
+            variableAssignments = listOf()
         )
         val set = baseFunctionDecl.copy(name = "set<$codeType>")
         val get = baseFunctionDecl.copy(name = "get<$codeType>")
@@ -119,7 +121,8 @@ fun LibraryDecl.addMissingAutomata(): LibraryDecl {
             name = it.entity.type,
             states = defaultStates,
             shifts = listOf(),
-            extendable = false
+            extendable = false,
+            statements = listOf()
         ) }
     return this.copy(automata = automata + generatedAutomata)
 }

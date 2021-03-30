@@ -20,7 +20,8 @@ data class Automaton(
     val states: List<StateDecl>,
     val shifts: List<ShiftDecl>,
     val extendable: Boolean,
-    val associatedFunctions: List<FunctionDecl> = listOf()
+    val associatedFunctions: List<FunctionDecl> = listOf(),
+    val statements: List<AutomatonStatement>
 ) : Node
 
 data class TypeDecl(val semanticType: SemanticType, val codeType: CodeType) : Node
@@ -57,7 +58,8 @@ data class FunctionDecl(
     val staticName: StaticDecl?,
     val properties: List<PropertyDecl>,
     val builtin: Boolean = false,
-    val codeName: String = name
+    val codeName: String = name,
+    val variableAssignments: List<VariableAssignmentNew>
 ) : Node
 
 data class FunctionEntityDecl(val type: SemanticType, val declStyle: FunctionEntityDeclStyle) {
@@ -84,3 +86,15 @@ data class StaticDecl(val staticName: String) : Node
 data class PropertyDecl(val key: String, val value: String) : Node
 
 data class JavaPackageDecl(val name: String) : Node
+
+interface AutomatonStatement : Node
+
+data class AutomatonVariableStatement(
+    val name: String,
+    val type: String
+) : AutomatonStatement
+
+data class VariableAssignmentNew(
+    val name: String,
+    val calleeAutomatonName: String
+) : Node

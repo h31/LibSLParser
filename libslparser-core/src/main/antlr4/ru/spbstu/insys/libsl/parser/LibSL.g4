@@ -109,11 +109,19 @@ converterExpression
    ;
 
 automatonDescription
-   :   'automaton' automatonName '{' javapackage? (stateDecl|finishstateDecl|shiftDecl|extendableFlag)* '}'
+   :   'automaton' automatonName '{' javapackage? (stateDecl|finishstateDecl|shiftDecl|extendableFlag|automatonStatement)* '}'
    ;
 
 javapackage
    :   'javapackage' Identifier('.'Identifier)* ';'
+   ;
+
+automatonStatement
+   :   automatonVariableDecl
+   ;
+
+automatonVariableDecl
+   :   'var' Identifier ':' semanticType ';'
    ;
 
 stateDecl
@@ -157,6 +165,7 @@ funProperties
    |   'requires' ';'
    |   'when' ';'
    |   propertyDecl
+   |   variableAssignment
    |   staticDecl
    ;
 
@@ -196,6 +205,9 @@ funName
    :   Identifier
    ;
 
+variableAssignment
+   :   Identifier '= new' automatonName '();'
+   ;
 
 funArgs
    :   funArg (',' funArg)*

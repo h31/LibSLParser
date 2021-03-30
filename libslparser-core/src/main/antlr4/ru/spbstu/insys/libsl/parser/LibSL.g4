@@ -109,7 +109,11 @@ converterExpression
    ;
 
 automatonDescription
-   :   'automaton' automatonName '{' (stateDecl|finishstateDecl|shiftDecl|extendableFlag)* '}'
+   :   'automaton' automatonName '{' javapackage? (stateDecl|finishstateDecl|shiftDecl|extendableFlag)* '}'
+   ;
+
+javapackage
+   :   'javapackage' Identifier('.'Identifier)* ';'
    ;
 
 stateDecl

@@ -49,7 +49,10 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
         val states = ctx.stateDecl().flatMap { visitStateDecl(it) }
         val shifts = ctx.shiftDecl().map { visitShiftDecl(it) }
         val extendable = ctx.extendableFlag().any()
+        val javaPackageDecl = ctx.javapackage()
+        val javaPackage = visitJavapackage(javaPackageDecl)
         return Automaton(
+            javaPackage = javaPackage,
             name = visitSemanticType(ctx.automatonName().semanticType()),
             states = states,
             shifts = shifts,
@@ -149,4 +152,10 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
                 )
             else -> SimpleSemanticType(ctx.text)
         }
+
+    override fun visitJavapackage(ctx: LibSLParser.JavapackageContext?): JavaPackageDecl {
+        if (ctx == null) return defaultPackageDeclaration
+        val name = ctx.Identifier().joinToString(separator = ".") { part -> part.text }
+        return JavaPackageDecl(name)
+    }
 }

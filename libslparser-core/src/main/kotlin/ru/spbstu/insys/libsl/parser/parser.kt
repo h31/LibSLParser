@@ -183,7 +183,8 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
         if (ctx == null) error("wrong assignment of variable")
         return VariableAssignmentNew(
             name = ctx.Identifier().text,
-            calleeAutomatonName = ctx.automatonName().text
+            calleeAutomatonName = ctx.automatonName().text,
+            calleeArguments = listOf(ctx.automatonArgs().automatonArg().Identifier().text)
         )
     }
 }

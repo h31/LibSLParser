@@ -81,5 +81,6 @@ class ParserTest {
         val assignment = parsedModel.functions[0].variableAssignments[0]
         assertEquals(assignment.name, "testVariable")
         assertEquals(assignment.calleeAutomatonName, "Test")
+        assertEquals(assignment.calleeArguments, listOf("A"))
     }
 }

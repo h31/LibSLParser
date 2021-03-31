@@ -5,9 +5,10 @@ types {
 }
 
 automaton Test {
+    state A;
     var testVariable : CustomString;
 }
 
 fun Test.foo() {
-    testVariable = new Test();
+    testVariable = new Test(A);
 }

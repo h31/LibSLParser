@@ -96,5 +96,6 @@ data class AutomatonVariableStatement(
 
 data class VariableAssignmentNew(
     val name: String,
-    val calleeAutomatonName: String
+    val calleeAutomatonName: String,
+    val calleeArguments: List<String>
 ) : Node

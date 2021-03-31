@@ -206,7 +206,15 @@ funName
    ;
 
 variableAssignment
-   :   Identifier '= new' automatonName '();'
+   :   Identifier '=' 'new' automatonName '(' automatonArgs? ')' ';'
+   ;
+
+automatonArgs
+   :   automatonArg
+   ;
+
+automatonArg
+   :   Identifier
    ;
 
 funArgs

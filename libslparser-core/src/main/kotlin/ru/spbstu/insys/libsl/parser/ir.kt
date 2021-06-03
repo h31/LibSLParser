@@ -63,7 +63,14 @@ fun LibraryDecl.addComplexTypesDecls(complexTypeConversion: Map<String, String>)
         )
     }
     val automata = typeDecls.map { type ->
-        Automaton(name = type.semanticType, states = listOf(), shifts = listOf(), extendable = false)
+        Automaton(
+            javaPackage = null,
+            name = type.semanticType,
+            states = listOf(),
+            shifts = listOf(),
+            extendable = false,
+            statements = listOf()
+        )
     }
     return this.copy(types = this.types + typeDecls, automata = this.automata + automata)
 }
@@ -82,7 +89,8 @@ fun LibraryDecl.generateHandlersForArrayAndPointerTypes(): LibraryDecl {
             ),
             name = "", args = listOf(),
             actions = listOf(), returnValue = null,
-            staticName = null, properties = listOf(), builtin = true
+            staticName = null, properties = listOf(), builtin = true,
+            variableAssignments = listOf()
         )
         val set = baseFunctionDecl.copy(name = "set<$codeType>")
         val get = baseFunctionDecl.copy(name = "get<$codeType>")
@@ -96,7 +104,11 @@ fun LibraryDecl.generateHandlersForArrayAndPointerTypes(): LibraryDecl {
     return copy(functions = functions + newFunctionDecl)
 }
 
-val defaultStates = listOf(StateDecl("Created"), StateDecl("Constructed"), StateDecl("Closed"))
+val defaultStates = listOf(
+    StateDecl("Created", isFinish = false),
+    StateDecl("Constructed", isFinish = false),
+    StateDecl("Closed", isFinish = true)
+)
 
 fun LibraryDecl.addDefaultStates(): LibraryDecl =
     copy(automata = automata.map { it.copy(states = (it.states + defaultStates).distinct()) })
@@ -105,6 +117,13 @@ fun LibraryDecl.addMissingAutomata(): LibraryDecl {
     val existingAutomataNames = automata.map { it.name }
     val generatedAutomata = functions
         .filter { it.entity.type !in existingAutomataNames }
-        .map { Automaton(name = it.entity.type, states = defaultStates, shifts = listOf(), extendable = false) }
+        .map { Automaton(
+            javaPackage = null,
+            name = it.entity.type,
+            states = defaultStates,
+            shifts = listOf(),
+            extendable = false,
+            statements = listOf()
+        ) }
     return this.copy(automata = automata + generatedAutomata)
 }

@@ -3,6 +3,7 @@ package ru.spbstu.insys.libsl.parser.test
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import ru.spbstu.insys.libsl.parser.AutomatonVariableStatement
 import ru.spbstu.insys.libsl.parser.ModelParser
 import ru.spbstu.insys.libsl.parser.print
 import java.io.StringReader
@@ -59,5 +60,41 @@ class ParserTest {
         assertEquals("test", parsedModel.name)
         assertEquals(1, parsedModel.types.size)
         assertEquals(1, parsedModel.automata.size)
+    }
+
+    @Test
+    fun parseWithPackage() {
+        val model = "library test; types{A (B);} automaton Test {javapackage ru.spbstu.test.package;}"
+        val reader = StringReader(model)
+        val parsedModel = ModelParser().parse(reader)
+        assertEquals("ru.spbstu.test.package", parsedModel.automata[0].javaPackage?.name)
+    }
+
+    @Test
+    fun parseWithVariables() {
+        val sourceModel = assertNotNull(readResourceAsString("models/LibraryWithVariables.lsl"))
+        val parsedModel = ModelParser().parse(sourceModel)
+        val variable = parsedModel.automata[0].statements[0] as AutomatonVariableStatement
+        assertEquals(variable.name, "testVariable")
+        assertEquals(variable.type, "CustomString")
+
+        val assignment = parsedModel.functions[0].variableAssignments[0]
+        assertEquals(assignment.name, "testVariable")
+        assertEquals(assignment.calleeAutomatonName, "Test")
+        assertEquals(assignment.calleeArguments, listOf("A"))
+    }
+
+    @Test
+    fun parseWithFinalStates() {
+        val sourceModel = assertNotNull(readResourceAsString("models/LibraryWithFinishState.lsl"))
+        val parsedModel = ModelParser().parse(sourceModel)
+        val allStates = parsedModel.automata[0].states
+        val nonFinishStates = allStates.filter { !it.isFinish }
+        val finishStates = allStates.filter { it.isFinish }
+
+        assertEquals(2, nonFinishStates.size)
+        assertEquals(1, finishStates.size)
+
+        assertEquals("F", finishStates.first().name)
     }
 }

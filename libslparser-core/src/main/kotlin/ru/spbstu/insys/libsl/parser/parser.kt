@@ -46,14 +46,23 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
     }
 
     override fun visitAutomatonDescription(ctx: LibSLParser.AutomatonDescriptionContext): Automaton {
-        val states = ctx.stateDecl().flatMap { visitStateDecl(it) }
+        val nonFinishStates = ctx.stateDecl().flatMap { visitStateDecl(it) }
+        val finalStates = ctx.finishstateDecl().map { visitFinishstateDecl(it) }
         val shifts = ctx.shiftDecl().map { visitShiftDecl(it) }
         val extendable = ctx.extendableFlag().any()
+        val javaPackageDecl = ctx.javapackage()
+        val javaPackage = visitJavapackage(javaPackageDecl)
+        val statements = ctx.automatonStatement().map {
+                visitAutomatonStatement(it)
+            }
+            .filterIsInstance<AutomatonStatement>()
         return Automaton(
+            javaPackage = javaPackage,
             name = visitSemanticType(ctx.automatonName().semanticType()),
-            states = states,
+            states = nonFinishStates + finalStates,
             shifts = shifts,
-            extendable = extendable
+            extendable = extendable,
+            statements = statements
         )
     }
 
@@ -61,7 +70,10 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
         TypeDecl(semanticType = visitSemanticType(ctx.semanticType()), codeType = CodeType(ctx.codeType().text))
 
     override fun visitStateDecl(ctx: LibSLParser.StateDeclContext): NodeList<StateDecl> =
-        NodeList(ctx.stateName().map { StateDecl(name = it.text) })
+        NodeList(ctx.stateName().map { StateDecl(name = it.text, isFinish = false) })
+
+    override fun visitFinishstateDecl(ctx: LibSLParser.FinishstateDeclContext): StateDecl =
+        StateDecl(ctx.stateName().text, isFinish = true)
 
     override fun visitShiftDecl(ctx: LibSLParser.ShiftDeclContext): ShiftDecl =
         ShiftDecl(from = ctx.srcState().text, to = ctx.dstState().text,
@@ -75,16 +87,21 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
 
     override fun visitFunDecl(ctx: LibSLParser.FunDeclContext): FunctionDecl {
         val args = ctx.funArgs()?.funArg()?.map { visitFunArg(it) } ?: listOf()
-        val actions = ctx.funProperties().map { visit(it) }.filterIsInstance<ActionDecl>()
-        val staticName = ctx.funProperties().map { visit(it) }.filterIsInstance<StaticDecl>().singleOrNull()
-        val properties = ctx.funProperties().map { visit(it) }.filterIsInstance<PropertyDecl>()
+
+        val statements = ctx.funProperties().map { visit(it) }
+
+        val actions = statements.filterIsInstance<ActionDecl>()
+        val staticName = statements.filterIsInstance<StaticDecl>().singleOrNull()
+        val properties = statements.filterIsInstance<PropertyDecl>()
+        val variableAssignments = statements.filterIsInstance<VariableAssignmentNew>()
         return FunctionDecl(
             entity = findFunctionEntity(ctx, args),
             name = ctx.funName().text,
             args = args, actions = actions,
             returnValue = visitFunReturnType(ctx.funReturnType()),
             staticName = staticName,
-            properties = properties
+            properties = properties,
+            variableAssignments = variableAssignments
         )
     }
 
@@ -149,4 +166,29 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
                 )
             else -> SimpleSemanticType(ctx.text)
         }
+
+    override fun visitJavapackage(ctx: LibSLParser.JavapackageContext?): JavaPackageDecl? {
+        if (ctx == null) return null
+        val name = ctx.Identifier().joinToString(separator = ".") { part -> part.text }
+        return JavaPackageDecl(name)
+    }
+
+    override fun visitAutomatonStatement(ctx: LibSLParser.AutomatonStatementContext?): Node {
+        return when {
+            ctx?.automatonVariableDecl() != null -> AutomatonVariableStatement(
+                ctx.automatonVariableDecl().Identifier().text,
+                ctx.automatonVariableDecl().semanticType().text
+            )
+            else -> error("unexpected statement type")
+        }
+    }
+
+    override fun visitVariableAssignment(ctx: LibSLParser.VariableAssignmentContext?): VariableAssignmentNew {
+        if (ctx == null) error("wrong assignment of variable")
+        return VariableAssignmentNew(
+            name = ctx.Identifier().text,
+            calleeAutomatonName = ctx.automatonName().text,
+            calleeArguments = listOf(ctx.automatonArgs().automatonArg().Identifier().text)
+        )
+    }
 }

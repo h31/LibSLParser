@@ -4,9 +4,6 @@ import java.nio.file.Path
 
 val primitiveSemanticTypes = listOf("String", "Int", "Char", "Boolean")
 
-val defaultPackageName = "default"
-val defaultPackageDeclaration = JavaPackageDecl(defaultPackageName)
-
 fun LibraryDecl.getArrayTypesFromFunctionDecls(): Collection<ComplexSemanticType> =
     this.functions.flatMap { it.args }.map { it.type }.filterArrayTypes().toSet()
 
@@ -67,7 +64,7 @@ fun LibraryDecl.addComplexTypesDecls(complexTypeConversion: Map<String, String>)
     }
     val automata = typeDecls.map { type ->
         Automaton(
-            javaPackage = defaultPackageDeclaration,
+            javaPackage = null,
             name = type.semanticType,
             states = listOf(),
             shifts = listOf(),
@@ -110,7 +107,7 @@ fun LibraryDecl.generateHandlersForArrayAndPointerTypes(): LibraryDecl {
 val defaultStates = listOf(
     StateDecl("Created", isFinish = false),
     StateDecl("Constructed", isFinish = false),
-    StateDecl("Closed", isFinish = false)
+    StateDecl("Closed", isFinish = true)
 )
 
 fun LibraryDecl.addDefaultStates(): LibraryDecl =
@@ -121,7 +118,7 @@ fun LibraryDecl.addMissingAutomata(): LibraryDecl {
     val generatedAutomata = functions
         .filter { it.entity.type !in existingAutomataNames }
         .map { Automaton(
-            javaPackage = defaultPackageDeclaration,
+            javaPackage = null,
             name = it.entity.type,
             states = defaultStates,
             shifts = listOf(),

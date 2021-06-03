@@ -15,7 +15,7 @@ data class LibraryDecl(
 open class NodeList<T>(private val list: List<T>) : Node, List<T> by list
 
 data class Automaton(
-    val javaPackage: JavaPackageDecl,
+    val javaPackage: JavaPackageDecl?,
     val name: SemanticType,
     val states: List<StateDecl>,
     val shifts: List<ShiftDecl>,
@@ -85,7 +85,7 @@ data class StaticDecl(val staticName: String) : Node
 
 data class PropertyDecl(val key: String, val value: String) : Node
 
-data class JavaPackageDecl(val name: String) : Node
+data class JavaPackageDecl(val name: String?) : Node
 
 interface AutomatonStatement : Node
 

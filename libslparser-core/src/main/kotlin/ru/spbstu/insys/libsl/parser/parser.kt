@@ -167,8 +167,8 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
             else -> SimpleSemanticType(ctx.text)
         }
 
-    override fun visitJavapackage(ctx: LibSLParser.JavapackageContext?): JavaPackageDecl {
-        if (ctx == null) return defaultPackageDeclaration
+    override fun visitJavapackage(ctx: LibSLParser.JavapackageContext?): JavaPackageDecl? {
+        if (ctx == null) return null
         val name = ctx.Identifier().joinToString(separator = ".") { part -> part.text }
         return JavaPackageDecl(name)
     }

@@ -67,7 +67,7 @@ class ParserTest {
         val model = "library test; types{A (B);} automaton Test {javapackage ru.spbstu.test.package;}"
         val reader = StringReader(model)
         val parsedModel = ModelParser().parse(reader)
-        assertEquals("ru.spbstu.test.package", parsedModel.automata[0].javaPackage.name)
+        assertEquals("ru.spbstu.test.package", parsedModel.automata[0].javaPackage?.name)
     }
 
     @Test

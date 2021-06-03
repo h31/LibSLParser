@@ -107,7 +107,11 @@ fun LibraryDecl.generateHandlersForArrayAndPointerTypes(): LibraryDecl {
     return copy(functions = functions + newFunctionDecl)
 }
 
-val defaultStates = listOf(StateDecl("Created"), StateDecl("Constructed"), StateDecl("Closed"))
+val defaultStates = listOf(
+    StateDecl("Created", isFinish = false),
+    StateDecl("Constructed", isFinish = false),
+    StateDecl("Closed", isFinish = false)
+)
 
 fun LibraryDecl.addDefaultStates(): LibraryDecl =
     copy(automata = automata.map { it.copy(states = (it.states + defaultStates).distinct()) })

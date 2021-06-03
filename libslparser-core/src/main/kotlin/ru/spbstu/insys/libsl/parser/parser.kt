@@ -46,7 +46,8 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
     }
 
     override fun visitAutomatonDescription(ctx: LibSLParser.AutomatonDescriptionContext): Automaton {
-        val states = ctx.stateDecl().flatMap { visitStateDecl(it) }
+        val nonFinishStates = ctx.stateDecl().flatMap { visitStateDecl(it) }
+        val finalStates = ctx.finishstateDecl().map { visitFinishstateDecl(it) }
         val shifts = ctx.shiftDecl().map { visitShiftDecl(it) }
         val extendable = ctx.extendableFlag().any()
         val javaPackageDecl = ctx.javapackage()
@@ -58,7 +59,7 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
         return Automaton(
             javaPackage = javaPackage,
             name = visitSemanticType(ctx.automatonName().semanticType()),
-            states = states,
+            states = nonFinishStates + finalStates,
             shifts = shifts,
             extendable = extendable,
             statements = statements
@@ -69,7 +70,10 @@ private class LibSLReader : LibSLBaseVisitor<Node>() {
         TypeDecl(semanticType = visitSemanticType(ctx.semanticType()), codeType = CodeType(ctx.codeType().text))
 
     override fun visitStateDecl(ctx: LibSLParser.StateDeclContext): NodeList<StateDecl> =
-        NodeList(ctx.stateName().map { StateDecl(name = it.text) })
+        NodeList(ctx.stateName().map { StateDecl(name = it.text, isFinish = false) })
+
+    override fun visitFinishstateDecl(ctx: LibSLParser.FinishstateDeclContext): StateDecl =
+        StateDecl(ctx.stateName().text, isFinish = true)
 
     override fun visitShiftDecl(ctx: LibSLParser.ShiftDeclContext): ShiftDecl =
         ShiftDecl(from = ctx.srcState().text, to = ctx.dstState().text,

@@ -77,7 +77,7 @@ data class ActionDecl(val name: String, val args: List<String>) : Node
 
 data class FunctionArgument(val name: String, val type: SemanticType, val annotations: List<String>) : Node
 
-data class StateDecl(val name: String) : Node
+data class StateDecl(val name: String, val isFinish: Boolean) : Node
 
 data class ShiftDecl(val from: String, val to: String, val functions: List<String>) : Node
 

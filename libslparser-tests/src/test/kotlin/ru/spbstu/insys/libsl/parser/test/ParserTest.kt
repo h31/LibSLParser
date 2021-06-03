@@ -83,4 +83,18 @@ class ParserTest {
         assertEquals(assignment.calleeAutomatonName, "Test")
         assertEquals(assignment.calleeArguments, listOf("A"))
     }
+
+    @Test
+    fun parseWithFinalStates() {
+        val sourceModel = assertNotNull(readResourceAsString("models/LibraryWithFinishState.lsl"))
+        val parsedModel = ModelParser().parse(sourceModel)
+        val allStates = parsedModel.automata[0].states
+        val nonFinishStates = allStates.filter { !it.isFinish }
+        val finishStates = allStates.filter { it.isFinish }
+
+        assertEquals(2, nonFinishStates.size)
+        assertEquals(1, finishStates.size)
+
+        assertEquals("F", finishStates.first().name)
+    }
 }
